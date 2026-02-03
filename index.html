@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>실시간 랭킹</title>
+<style>
+  body {
+    margin: 0;
+    background: #0b0b0b;
+    color: #fff;
+    font-family: Pretendard, Apple SD Gothic Neo, sans-serif;
+  }
+  .wrap {
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  h1 {
+    margin-bottom: 16px;
+    font-size: 28px;
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 20px;
+  }
+  th, td {
+    padding: 14px;
+    text-align: center;
+  }
+  th {
+    background: #1a1a1a;
+  }
+  tr:nth-child(even) {
+    background: #141414;
+  }
+  .rank {
+    font-size: 26px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔥 실시간 순위표 🔥</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>순위</th>
+        <th>스트리머</th>
+        <th>최종 점수</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+</div>
+
+<script>
+const URL = "https://opensheet.elk.sh/18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0/%EC%8B%9C%ED%8A%B81";
+
+function loadData() {
+  fetch(URL)
+    .then(res => res.json())
+    .then(data => {
+      // 점수 기준 정렬
+      data.sort((a, b) => b["최종 점수"] - a["최종 점수"]);
+
+      const tbody = document.getElementById("list");
+      tbody.innerHTML = "";
+
+      data.forEach((row, i) => {
+        const medal =
+          i === 0 ? "🥇" :
+          i === 1 ? "🥈" :
+          i === 2 ? "🥉" : i + 1;
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="rank">${medal}</td>
+            <td>${row["스트리머"]}</td>
+            <td>${row["최종 점수"]}</td>
+          </tr>
+        `;
+      });
+    });
+}
+
+// 3초마다 갱신
+loadData();
+setInterval(loadData, 3000);
+</script>
+</body>
+</html>
