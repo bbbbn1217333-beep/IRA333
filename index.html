@@ -99,7 +99,18 @@ const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
 const RANGE = "E12:I15";
 
-const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}!${RANGE}?t=${Date.now()}`;
+async function fetchData() {
+  const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}!${RANGE}?t=${Date.now()}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 const board = document.getElementById("board");
 
 let prevData = "";
@@ -165,6 +176,7 @@ setInterval(fetchData, 2000);
 </script>
 </body>
 </html>
+
 
 
 
