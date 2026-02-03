@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html>
+<body style="background:black;color:white">
+
+<div id="rows"></div>
+
 <script>
 const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
@@ -5,39 +11,17 @@ const RANGE = "E12:I15";
 
 const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}!${RANGE}`;
 
-async function loadData() {
-  const res = await fetch(URL);
-  const data = await res.json();
-
-  const container = document.getElementById("rows");
-  container.innerHTML = "";
-
-  data.forEach((row, i) => {
-    // E~I 순서 그대로
-    const [streamer, set1, set2, set3, total] = Object.values(row);
-
-    const div = document.createElement("div");
-    div.className = "row";
-
-    if (i === 0) div.classList.add("gold");
-    if (i === 1) div.classList.add("silver");
-    if (i === 2) div.classList.add("bronze");
-
-    div.innerHTML = `
-      <div class="rank">${i + 1}</div>
-      <div class="name">${streamer}</div>
-      <div class="cell">${set1}</div>
-      <div class="cell">${set2}</div>
-      <div class="cell">${set3}</div>
-      <div class="cell">${total}</div>
-    `;
-
-    container.appendChild(div);
+fetch(URL)
+  .then(res => res.json())
+  .then(data => {
+    const rows = document.getElementById("rows");
+    rows.innerHTML = JSON.stringify(data, null, 2);
   });
-}
-
-loadData();
-setInterval(loadData, 2000);
 </script>
+
+</body>
+</html>
+
+
 
 
