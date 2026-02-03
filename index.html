@@ -1,3 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>메이플 스트리머 랭킹</title>
+
+<!-- 폰트 -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSans.css" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  background: #111; /* 검은 배경 대신 조금 연하게 */
+  font-family: 'Montserrat', sans-serif;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+}
+
+.board {
+  width: 760px;
+  background: linear-gradient(180deg, rgba(15,15,20,0.92), rgba(8,8,12,0.92));
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 0 30px rgba(255,215,100,0.15);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 1.2fr;
+  align-items: center;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  font-size: 16px;
+}
+
+.header {
+  background: rgba(255,215,120,0.15);
+  font-weight: 800;
+  font-size: 15px;
+  color: #ffeaa7;
+}
+
+.rank {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.name {
+  font-family: 'GmarketSans', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+.num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.score {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* 메달 효과 */
+.gold {
+  background: linear-gradient(90deg, #ffda77, #ffb703);
+  color: #2b1b00;
+}
+.silver {
+  background: linear-gradient(90deg, #e0e0e0, #bfc9ca);
+  color: #1c1c1c;
+}
+.bronze {
+  background: linear-gradient(90deg, #e6b17e, #b87333);
+  color: #2a1600;
+}
+
+.crown {
+  animation: crownBounce 1.3s infinite;
+}
+
+@keyframes crownBounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+</style>
+</head>
+
+<body>
+<div class="board" id="board">로딩 중...</div>
+
 <script>
 const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
@@ -6,20 +105,28 @@ const RANGE = "E12:I15";
 const board = document.getElementById("board");
 let prevData = "";
 
+// 데이터 가져오기
 async function fetchData() {
   const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}!${RANGE}?t=${Date.now()}`;
+  console.log("fetch URL:", url);
 
   try {
     const res = await fetch(url);
     const data = await res.json();
+    console.log("fetch data:", data);
     render(data);
   } catch (e) {
     console.error("데이터 로드 실패:", e);
+    board.innerHTML = "데이터 로드 실패 😢";
   }
 }
 
+// 화면에 렌더링
 function render(data) {
-  if (!data || !data.length) return;
+  if (!data || !data.length) {
+    board.innerHTML = "데이터가 없습니다 😶";
+    return;
+  }
 
   const json = JSON.stringify(data);
   if (json === prevData) return;
@@ -52,19 +159,25 @@ function render(data) {
 
     div.innerHTML = `
       <div class="rank ${i === 0 ? "crown" : ""}">${medal}</div>
-      <div class="name">${row["🎙️스트리머"] || ""}</div>
-      <div class="num">${row["🥊1세트"] || ""}</div>
-      <div class="num">${row["🥊2세트"] || ""}</div>
-      <div class="num">${row["🥊3세트"] || ""}</div>
-      <div class="score">${row["📝최종 점수"] || ""}</div>
+      <div class="name">${row["스트리머"] || ""}</div>
+      <div class="num">${row["1세트"] || ""}</div>
+      <div class="num">${row["2세트"] || ""}</div>
+      <div class="num">${row["3세트"] || ""}</div>
+      <div class="score">${row["최종 점수"] || ""}</div>
     `;
+
     board.appendChild(div);
   });
 }
 
+// 주기적 갱신
 fetchData();
 setInterval(fetchData, 2000);
 </script>
+</body>
+</html>
+
+
 
 
 
