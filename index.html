@@ -11,7 +11,7 @@
 <style>
 body {
   margin: 0;
-  background: #111; /* 검은 배경 대신 조금 연하게 */
+  background: #111;
   font-family: 'Montserrat', sans-serif;
   color: #fff;
   display: flex;
@@ -159,11 +159,11 @@ function render(data) {
 
     div.innerHTML = `
       <div class="rank ${i === 0 ? "crown" : ""}">${medal}</div>
-      <div class="name">${row["스트리머"] || ""}</div>
-      <div class="num">${row["1세트"] || ""}</div>
-      <div class="num">${row["2세트"] || ""}</div>
-      <div class="num">${row["3세트"] || ""}</div>
-      <div class="score">${row["최종 점수"] || ""}</div>
+      <div class="name">${row["🎙️스트리머"] || ""}</div>
+      <div class="num">${row["🥊1세트"] || ""}</div>
+      <div class="num">${row["🥊2세트"] || ""}</div>
+      <div class="num">${row["🥊3세트"] || ""}</div>
+      <div class="score">${row["📝최종 점수"] || ""}</div>
     `;
 
     board.appendChild(div);
@@ -176,6 +176,7 @@ setInterval(fetchData, 2000);
 </script>
 </body>
 </html>
+
 
 
 
