@@ -2,137 +2,95 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<title>스트리머 대결 점수판</title>
+<title>스트리머 점수판</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=SUIT:wght@600;800&display=swap');
-
 body {
   margin: 0;
   background: transparent;
-  font-family: 'SUIT', sans-serif;
+  font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  color: white;
 }
 
 .board {
-  width: 820px;
-  padding: 18px;
-  background: rgba(10,10,10,0.88);
+  width: 720px;
+  background: rgba(10,10,10,0.85);
   border-radius: 20px;
-  box-shadow: 0 0 40px rgba(0,0,0,0.65);
-}
-
-.header, .row {
-  display: grid;
-  grid-template-columns: 70px 1.4fr repeat(4, 1fr);
-  align-items: center;
-}
-
-.header {
-  padding: 10px 14px;
-  font-size: 15px;
-  opacity: 0.65;
+  padding: 16px;
 }
 
 .row {
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #1c1c1c, #0f0f0f);
-  font-size: 18px;
-  animation: slideUp 0.4s ease;
+  display: grid;
+  grid-template-columns: 60px 1.5fr 1fr 1fr 1fr 1.2fr;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  transition: background 0.3s;
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+.header {
+  font-weight: 800;
+  font-size: 15px;
+  background: rgba(255,255,255,0.1);
 }
 
 .rank {
-  text-align: center;
-  font-weight: 800;
   font-size: 22px;
-}
-
-.name {
-  font-weight: 800;
-}
-
-.cell {
   text-align: center;
-  font-weight: 700;
 }
 
-.gold {
-  background: linear-gradient(145deg, #ffd700, #b8860b);
-  color: #000;
-}
-
-.silver {
-  background: linear-gradient(145deg, #e5e5e5, #a9a9a9);
-  color: #000;
-}
-
-.bronze {
-  background: linear-gradient(145deg, #cd7f32, #8b5a2b);
-  color: #000;
-}
+.gold { background: linear-gradient(90deg, #ffcc00, #ffb700); color: black; }
+.silver { background: linear-gradient(90deg, #cfd8dc, #b0bec5); color: black; }
+.bronze { background: linear-gradient(90deg, #d7a86e, #b87333); color: black; }
 
 .crown {
-  animation: crownPop 1.2s infinite alternate;
+  animation: bounce 1.2s infinite;
 }
 
-@keyframes crownPop {
-  from { transform: scale(1); }
-  to   { transform: scale(1.15); }
-}
-
-.score-up {
-  animation: flash 0.5s ease;
-}
-
-@keyframes flash {
-  0% { background: #fff; color: #000; }
-  100% { background: transparent; }
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 </style>
 </head>
 
 <body>
-<div class="board">
-  <div class="header">
-    <div class="rank">순위</div>
-    <div>🎙️ 스트리머</div>
-    <div>🥊1</div>
-    <div>🥊2</div>
-    <div>🥊3</div>
-    <div>📝최종</div>
-  </div>
-
-  <div id="rows"></div>
-</div>
+<div class="board" id="board"></div>
 
 <script>
 const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
-const RANGE = "E12:I";
+const RANGE = "E11:I15";
 
 const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}!${RANGE}`;
 
-let lastScores = {};
+const board = document.getElementById("board");
+let prevData = "";
 
-async function loadData() {
-  const res = await fetch(URL);
-  const data = await res.json();
+function render(data) {
+  const json = JSON.stringify(data);
+  if (json === prevData) return; // 변화 없으면 갱신 안 함
+  prevData = json;
 
-  const container = document.getElementById("rows");
-  container.innerHTML = "";
+  board.innerHTML = "";
+
+  // 헤더
+  const header = document.createElement("div");
+  header.className = "row header";
+  header.innerHTML = `
+    <div>#</div>
+    <div>🎙️스트리머</div>
+    <div>🥊1세트</div>
+    <div>🥊2세트</div>
+    <div>🥊3세트</div>
+    <div>📝최종 점수</div>
+  `;
+  board.appendChild(header);
 
   data.forEach((row, i) => {
-    const streamer = row["🎙️스트리머"];
-    const set1 = row["🥊1세트"];
-    const set2 = row["🥊2세트"];
-    const set3 = row["🥊3세트"];
-    const total = row["📝최종 점수"];
+    const score = Number(row["📝최종 점수"]) || 0;
 
     const div = document.createElement("div");
     div.className = "row";
@@ -148,28 +106,34 @@ async function loadData() {
 
     div.innerHTML = `
       <div class="rank ${i === 0 ? "crown" : ""}">${medal}</div>
-      <div class="name">${streamer}</div>
-      <div class="cell">${set1}</div>
-      <div class="cell">${set2}</div>
-      <div class="cell">${set3}</div>
-      <div class="cell total">${total}</div>
+      <div>${row["🎙️스트리머"]}</div>
+      <div>${row["🥊1세트"]}</div>
+      <div>${row["🥊2세트"]}</div>
+      <div>${row["🥊3세트"]}</div>
+      <div><b>${score}</b></div>
     `;
 
-    // 점수 변동 애니메이션
-    if (lastScores[streamer] !== undefined && lastScores[streamer] != total) {
-      div.querySelector(".total").classList.add("score-up");
-    }
-    lastScores[streamer] = total;
-
-    container.appendChild(div);
+    board.appendChild(div);
   });
 }
 
-loadData();
-setInterval(loadData, 2000);
+async function fetchData() {
+  try {
+    const res = await fetch(URL);
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+fetchData();
+setInterval(fetchData, 2000);
 </script>
 </body>
 </html>
+
+
 
 
 
