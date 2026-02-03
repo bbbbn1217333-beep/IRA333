@@ -1,26 +1,176 @@
 <!DOCTYPE html>
-<html>
-<body style="background:black;color:white">
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>스트리머 대결 점수판</title>
 
-<div id="rows"></div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=SUIT:wght@600;800&display=swap');
+
+body {
+  margin: 0;
+  background: transparent;
+  font-family: 'SUIT', sans-serif;
+}
+
+.board {
+  width: 820px;
+  padding: 18px;
+  background: rgba(10,10,10,0.88);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.65);
+}
+
+.header, .row {
+  display: grid;
+  grid-template-columns: 70px 1.4fr repeat(4, 1fr);
+  align-items: center;
+}
+
+.header {
+  padding: 10px 14px;
+  font-size: 15px;
+  opacity: 0.65;
+}
+
+.row {
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #1c1c1c, #0f0f0f);
+  font-size: 18px;
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rank {
+  text-align: center;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.name {
+  font-weight: 800;
+}
+
+.cell {
+  text-align: center;
+  font-weight: 700;
+}
+
+.gold {
+  background: linear-gradient(145deg, #ffd700, #b8860b);
+  color: #000;
+}
+
+.silver {
+  background: linear-gradient(145deg, #e5e5e5, #a9a9a9);
+  color: #000;
+}
+
+.bronze {
+  background: linear-gradient(145deg, #cd7f32, #8b5a2b);
+  color: #000;
+}
+
+.crown {
+  animation: crownPop 1.2s infinite alternate;
+}
+
+@keyframes crownPop {
+  from { transform: scale(1); }
+  to   { transform: scale(1.15); }
+}
+
+.score-up {
+  animation: flash 0.5s ease;
+}
+
+@keyframes flash {
+  0% { background: #fff; color: #000; }
+  100% { background: transparent; }
+}
+</style>
+</head>
+
+<body>
+<div class="board">
+  <div class="header">
+    <div class="rank">순위</div>
+    <div>🎙️ 스트리머</div>
+    <div>🥊1</div>
+    <div>🥊2</div>
+    <div>🥊3</div>
+    <div>📝최종</div>
+  </div>
+
+  <div id="rows"></div>
+</div>
 
 <script>
 const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
-const RANGE = "E12:I15";
+const RANGE = "E12:I";
 
 const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}!${RANGE}`;
 
-fetch(URL)
-  .then(res => res.json())
-  .then(data => {
-    const rows = document.getElementById("rows");
-    rows.innerHTML = JSON.stringify(data, null, 2);
-  });
-</script>
+let lastScores = {};
 
+async function loadData() {
+  const res = await fetch(URL);
+  const data = await res.json();
+
+  const container = document.getElementById("rows");
+  container.innerHTML = "";
+
+  data.forEach((row, i) => {
+    const streamer = row["🎙️스트리머"];
+    const set1 = row["🥊1세트"];
+    const set2 = row["🥊2세트"];
+    const set3 = row["🥊3세트"];
+    const total = row["📝최종 점수"];
+
+    const div = document.createElement("div");
+    div.className = "row";
+
+    if (i === 0) div.classList.add("gold");
+    if (i === 1) div.classList.add("silver");
+    if (i === 2) div.classList.add("bronze");
+
+    const medal =
+      i === 0 ? "👑" :
+      i === 1 ? "🥈" :
+      i === 2 ? "🥉" : i + 1;
+
+    div.innerHTML = `
+      <div class="rank ${i === 0 ? "crown" : ""}">${medal}</div>
+      <div class="name">${streamer}</div>
+      <div class="cell">${set1}</div>
+      <div class="cell">${set2}</div>
+      <div class="cell">${set3}</div>
+      <div class="cell total">${total}</div>
+    `;
+
+    // 점수 변동 애니메이션
+    if (lastScores[streamer] !== undefined && lastScores[streamer] != total) {
+      div.querySelector(".total").classList.add("score-up");
+    }
+    lastScores[streamer] = total;
+
+    container.appendChild(div);
+  });
+}
+
+loadData();
+setInterval(loadData, 2000);
+</script>
 </body>
 </html>
+
 
 
 
