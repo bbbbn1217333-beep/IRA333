@@ -11,12 +11,9 @@
 <style>
 body {
   margin: 0;
-  background: #111;
+  background: transparent;
   font-family: 'Montserrat', sans-serif;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  padding: 30px 0;
 }
 
 .board {
@@ -95,39 +92,19 @@ body {
 </head>
 
 <body>
-<div class="board" id="board">로딩 중...</div>
+<div class="board" id="board"></div>
 
 <script>
 const SHEET_ID = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
 const SHEET_NAME = "시트1";
 const RANGE = "E11:I15";
 
+const URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}!${RANGE}`;
 const board = document.getElementById("board");
+
 let prevData = "";
 
-// 데이터 가져오기
-async function fetchData() {
-  const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}!${RANGE}?t=${Date.now()}`;
-  console.log("fetch URL:", url);
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    console.log("fetch data:", data);
-    render(data);
-  } catch (e) {
-    console.error("데이터 로드 실패:", e);
-    board.innerHTML = "데이터 로드 실패 😢";
-  }
-}
-
-// 화면에 렌더링
 function render(data) {
-  if (!data || !data.length) {
-    board.innerHTML = "데이터가 없습니다 😶";
-    return;
-  }
-
   const json = JSON.stringify(data);
   if (json === prevData) return;
   prevData = json;
@@ -155,27 +132,40 @@ function render(data) {
     if (i === 1) div.classList.add("silver");
     if (i === 2) div.classList.add("bronze");
 
-    const medal = i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1;
+    const medal =
+      i === 0 ? "👑" :
+      i === 1 ? "🥈" :
+      i === 2 ? "🥉" : (i + 1);
 
     div.innerHTML = `
       <div class="rank ${i === 0 ? "crown" : ""}">${medal}</div>
-      <div class="name">${row["🎙️스트리머"] || ""}</div>
-      <div class="num">${row["🥊1세트"] || ""}</div>
-      <div class="num">${row["🥊2세트"] || ""}</div>
-      <div class="num">${row["🥊3세트"] || ""}</div>
-      <div class="score">${row["📝최종 점수"] || ""}</div>
+      <div class="name">${row["🎙️스트리머"]}</div>
+      <div class="num">${row["🥊1세트"]}</div>
+      <div class="num">${row["🥊2세트"]}</div>
+      <div class="num">${row["🥊3세트"]}</div>
+      <div class="score">${row["📝최종 점수"]}</div>
     `;
 
     board.appendChild(div);
   });
 }
 
-// 주기적 갱신
+async function fetchData() {
+  try {
+    const res = await fetch(URL);
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 fetchData();
 setInterval(fetchData, 2000);
 </script>
 </body>
 </html>
+
 
 
 
