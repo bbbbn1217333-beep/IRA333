@@ -29,19 +29,18 @@ body {
   width: 850px;
   background: var(--bg-dark);
   border-radius: 4px;
-  overflow: hidden;
+  overflow: visible; /* 이미지가 밖으로 나갈 수 있게 허용 */
   border: 1px solid var(--border-color);
 }
 
 .row {
   display: grid;
-  /* 비율 조정: 스트리머 영역을 조금 더 넓게 */
-  grid-template-columns: 60px 1.2fr 100px 100px 100px 120px;
+  grid-template-columns: 60px 1fr 100px 100px 100px 120px;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
   transition: background 0.2s;
-  /* 행의 최소 높이를 지정하여 이미지가 표 안에 꽉 차게 만듭니다 */
-  min-height: 80px; 
+  /* 표의 행 높이를 45px로 고정 (이미지가 커져도 이 높이는 안 변함) */
+  height: 45px; 
 }
 
 .row:last-child { border-bottom: none; }
@@ -49,41 +48,54 @@ body {
 
 .header {
   background: #1c1c1f;
-  height: 45px;
-  min-height: 45px; /* 헤더는 너무 높지 않게 고정 */
+  height: 40px;
   color: var(--text-gray);
   font-size: 13px;
   font-weight: 500;
 }
 
 .cell {
-  padding: 10px 0;
   text-align: center;
 }
 
-.rank { font-size: 16px; color: var(--text-gray); font-weight: bold; }
+.rank { font-size: 14px; color: var(--text-gray); font-weight: bold; }
 
 .name {
   display: flex;
   align-items: center;
-  gap: 15px;
   padding-left: 15px;
   font-weight: 600;
   color: var(--text-white);
+  position: relative; /* 이미지 배치의 기준점 */
+  height: 100%;
 }
 
 .avatar {
-  /* 이미지 크기 조절: 여기서 원하는 만큼 키우세요! */
-  width: 70px; 
-  height: 70px;
+  /* 이미지 크기만 마음껏 키우세요 (예: 70px) */
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
-  flex-shrink: 0; /* 이미지가 찌그러지지 않게 고정 */
+  border: 2px solid var(--border-color);
+  background: var(--bg-dark);
+  
+  /* 표의 행 높이에 영향을 주지 않도록 띄움 */
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%); /* 수직 중앙 정렬 */
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* 이름이 이미지와 겹치지 않게 뒤로 밀기 */
+.name-text {
+  margin-left: 80px; 
+  white-space: nowrap;
 }
 
 .num { color: var(--text-gray); font-size: 14px; }
-.score { color: var(--accent-blue); font-weight: 700; font-size: 18px; }
+.score { color: var(--accent-blue); font-weight: 700; font-size: 16px; }
 
 .row-1 { background: rgba(83, 131, 232, 0.05); }
 .rank-1 { color: #ffb900; }
@@ -141,7 +153,7 @@ function render(data) {
       <div class="cell name">
         <img src="/images/${name}.png" class="avatar" 
              onerror="this.src='/images/default.png'">
-        <span>${name}</span>
+        <span class="name-text">${name}</span>
       </div>
       <div class="cell num">${row["🥊1세트"]}</div>
       <div class="cell num">${row["🥊2세트"]}</div>
