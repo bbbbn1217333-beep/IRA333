@@ -18,7 +18,7 @@
 
 body {
   margin: 0;
-  padding: 40px 20px; /* 상단 여백 확보 */
+  padding: 20px;
   background-color: transparent;
   font-family: 'Pretendard', sans-serif;
   color: var(--text-white);
@@ -28,9 +28,9 @@ body {
   width: 850px;
   background: var(--bg-dark);
   border-radius: 4px;
-  overflow: visible; /* 이미지 튀어나오기 허용 */
+  overflow: visible; 
   border: 1px solid var(--border-color);
-  margin-top: 40px; 
+  margin-top: 50px; /* 이미지가 위로 튀어나오므로 상단 여백 추가 */
 }
 
 .row {
@@ -39,7 +39,7 @@ body {
   align-items: center;
   border-bottom: 1px solid var(--border-color);
   transition: background 0.2s;
-  height: 60px; /* 행 높이 고정 */
+  height: 60px; 
   position: relative;
 }
 
@@ -55,7 +55,7 @@ body {
 }
 
 .cell {
-  padding: 0;
+  padding: 12px 0;
   text-align: center;
 }
 
@@ -63,7 +63,7 @@ body {
 
 .name {
   position: relative;
-  padding-left: 130px; /* 이미지 너비보다 크게 여백 확보 */
+  padding-left: 120px; 
   font-weight: 600;
   color: var(--text-white);
   text-align: left;
@@ -71,22 +71,17 @@ body {
 
 .avatar {
   position: absolute;
-  left: 10px;
-  top: 50%; /* 50%로 중앙 정렬 후 조절 */
+  left: 15px;
+  top: 20%; 
   transform: translateY(-50%);
-  
-  /* 🔥 웃는 이미지, 우는 이미지 모두 110px로 강제 고정 */
-  width: 110px !important; 
-  height: 110px !important; 
-  
-  /* 🔥 이미지가 찌그러지지 않고 꽉 차게 */
-  object-fit: cover; 
+  width: 110px; 
+  height: 110px; 
+  object-fit: cover;
   border-radius: 12px;
-  
-  z-index: 100; /* 표의 다른 요소보다 위로 */
   pointer-events: none;
-  background: var(--bg-dark); /* 로딩 전 배경 */
-  transition: all 0.2s ease;
+  z-index: 10;
+  /* 표정이 바뀔 때 부드럽게 전환 */
+  transition: all 0.3s ease-in-out;
 }
 
 .num { color: var(--text-gray); font-size: 14px; }
@@ -116,7 +111,6 @@ function render(data) {
     return;
   }
 
-  // 최종 점수 기준 내림차순 정렬
   data.sort((a,b)=> Number(b["📝최종 점수"]) - Number(a["📝최종 점수"]));
 
   const json = JSON.stringify(data);
@@ -129,7 +123,7 @@ function render(data) {
   header.className = "row header";
   header.innerHTML = `
     <div class="cell">순위</div>
-    <div class="cell" style="text-align:left; padding-left:130px;">스트리머</div>
+    <div class="cell" style="text-align:left; padding-left:120px;">스트리머</div>
     <div class="cell">1세트</div>
     <div class="cell">2세트</div>
     <div class="cell">3세트</div>
@@ -139,11 +133,23 @@ function render(data) {
 
   data.forEach((row, i) => {
     const rank = i + 1;
-    const name = row["🎙️스트리머"];
+    const name = row["🎙️스트리머"]; // 예: '이라333'
 
-    // 1~3등은 웃는 모습, 4등 이하는 우는 모습 매칭
-    let fileNameBase = (name === "이라333") ? "IRA333" : name;
-    let finalImgName = (rank <= 3) ? `${fileNameBase}.png` : `${fileNameBase}UNHAPPY.png`;
+    // 🔥 [파일명 매칭 로직]
+    // 이름이 '이라333'일 때 파일명을 'IRA333'으로 매칭하기 위한 변환
+    // 만약 모든 스트리머가 한글 이름=영문 파일명 매칭이라면 mapping 테이블이 필요할 수 있습니다.
+    // 여기서는 '이라333' 한정으로 예시를 듭니다.
+    let fileNameBase = name === "이라333" ? "IRA333" : name;
+
+    // 🔥 [순위별 이미지 결정 로직]
+    let finalImgName = "";
+    if (rank <= 3) {
+      // 1~3등: 웃는 모습 (IRA333.png)
+      finalImgName = `${fileNameBase}.png`;
+    } else {
+      // 4등 이하: 우는 모습 (IRA333UNHAPPY.png)
+      finalImgName = `${fileNameBase}UNHAPPY.png`;
+    }
 
     const div = document.createElement("div");
     div.className = `row row-${rank}`;
@@ -181,6 +187,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
