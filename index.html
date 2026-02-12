@@ -20,23 +20,21 @@
 body {
   margin: 0;
   padding: 20px;
-  background-color: transparent; /* OBS 소스용 */
+  background-color: transparent;
   font-family: 'Pretendard', sans-serif;
   color: var(--text-white);
 }
 
 .board {
-  width: 850px; /* 이미지 비율에 맞춰 확장 */
+  width: 850px;
   background: var(--bg-dark);
   border-radius: 4px;
   overflow: hidden;
   border: 1px solid var(--border-color);
 }
 
-/* 테이블 레이아웃 구현 */
 .row {
   display: grid;
-  /* 순위 | 스트리머(자유) | 1세트 | 2세트 | 3세트 | 최종 점수 */
   grid-template-columns: 60px 1fr 100px 100px 100px 120px;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
@@ -46,7 +44,6 @@ body {
 .row:last-child { border-bottom: none; }
 .row:not(.header):hover { background: var(--row-hover); }
 
-/* 헤더 스타일 */
 .header {
   background: #1c1c1f;
   height: 40px;
@@ -55,21 +52,33 @@ body {
   font-weight: 500;
 }
 
-/* 데이터 셀 스타일 */
 .cell {
   padding: 12px 0;
   text-align: center;
 }
 
 .rank { font-size: 14px; color: var(--text-gray); font-weight: bold; }
-.name { text-align: left; padding-left: 15px; font-weight: 600; color: var(--text-white); }
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 15px;
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 6px; /* 동그랗게 하려면 50% */
+}
+
 .num { color: var(--text-gray); font-size: 14px; }
 .score { color: var(--accent-blue); font-weight: 700; font-size: 16px; }
 
-/* 1, 2, 3위 강조 (이미지 스타일) */
 .row-1 { background: rgba(83, 131, 232, 0.05); }
-
-/* 메달 효과 삭제하고 텍스트 위주로 깔끔하게 변경 가능 */
 .rank-1 { color: #ffb900; }
 </style>
 </head>
@@ -93,7 +102,6 @@ function render(data) {
     return;
   }
 
-  // 데이터 정렬
   data.sort((a,b)=> Number(b["📝최종 점수"]) - Number(a["📝최종 점수"]));
 
   const json = JSON.stringify(data);
@@ -102,7 +110,6 @@ function render(data) {
 
   board.innerHTML = "";
 
-  // 헤더 생성
   const header = document.createElement("div");
   header.className = "row header";
   header.innerHTML = `
@@ -117,12 +124,18 @@ function render(data) {
 
   data.forEach((row, i) => {
     const rank = i + 1;
+    const name = row["🎙️스트리머"];
+
     const div = document.createElement("div");
     div.className = `row row-${rank}`;
 
     div.innerHTML = `
       <div class="cell rank ${rank <= 3 ? 'rank-'+rank : ''}">${rank}</div>
-      <div class="cell name">${row["🎙️스트리머"]}</div>
+      <div class="cell name">
+        <img src="/images/${name}.png" class="avatar" 
+             onerror="this.src='/images/default.png'">
+        ${name}
+      </div>
       <div class="cell num">${row["🥊1세트"]}</div>
       <div class="cell num">${row["🥊2세트"]}</div>
       <div class="cell num">${row["🥊3세트"]}</div>
@@ -145,10 +158,11 @@ async function fetchData() {
 }
 
 fetchData();
-setInterval(fetchData, 5000); // 부하를 줄이기 위해 5초 권장
+setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
