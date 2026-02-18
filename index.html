@@ -442,11 +442,13 @@ const RANGE      = "E11:I15";
 let prevJSON = "";
 
 // ─── 스트리머 이름 → 이미지 파일명 변환 ───
-function getImgFile(name, isHappy) {
-  let base = name;
-  if (name === "이라333") base = "IRA333";
-  const suffix = isHappy ? ".gif" : "default.gif";
-  return `/images/${base}${suffix}`;
+function getImgFile(name, rank) {
+  // 이라333: 1~3등이면 default(웃음), 4등 이하면 이라333(울음)
+  if (name === "이라333") {
+    return rank <= 3 ? `/images/default.gif` : `/images/이라333.gif`;
+  }
+  // 다른 스트리머는 일단 default
+  return `/images/default.gif`;
 }
 
 // ─── 라운드 1등 찾기 ───
@@ -499,7 +501,7 @@ function render(data) {
     const isFirst = rank === 1;
     const pct     = maxScore > 0 ? Math.min(98, Math.max(4, (total / maxScore) * 94)) : 4;
 
-    const imgFile = getImgFile(name, isFirst);
+    const imgFile = getImgFile(name, rank);
     const imgHtml = `<img src="${imgFile}" onerror="this.parentElement.innerHTML='<div class=\\'runner-placeholder\\'>🧙</div>'" alt="${name}">`;
     const avatarLargeHtml = `<img src="${imgFile}" class="${rankBorderClass[i]}" onerror="this.parentElement.innerHTML='<div class=\\'avatar-placeholder\\'>🧙</div>'" alt="${name}">`;
 
@@ -556,6 +558,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
