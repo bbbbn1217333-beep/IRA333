@@ -500,7 +500,7 @@ function spawnFlyingChars() {
 
   targets.forEach((avatarEl, idx) => {
     // 시작 X: count명을 균등 분산
-    const startX = overlayW * 0.35 + idx * (overlayW * 0.30 / Math.max(count - 1, 1));
+    const startX = overlayW * 0.25 + idx * (overlayW * 0.20 / Math.max(count - 1, 1));
     const startY = overlayH + 80;
 
     const img = document.createElement("img");
@@ -675,9 +675,6 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
-
-
-
 
 
 
