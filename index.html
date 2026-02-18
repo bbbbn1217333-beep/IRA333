@@ -435,7 +435,7 @@ function render(data) {
 }
 
 async function fetchData() {
-  const url = "https://opensheet.elk.sh/" + SHEET_ID + "/" + encodeURIComponent(SHEET_NAME);
+  const url = "https://script.google.com/macros/s/AKfycbwOCpa65clcNPDIOdkAkO-ZHxmhokuEUmWYTDFcVI3KH-Hws9Wz4c9WMTRQvQJF5jJ6gg/exec/exec?t=" + Date.now();
   try {
     const res = await fetch(url);
     const data = await res.json();
@@ -450,6 +450,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
