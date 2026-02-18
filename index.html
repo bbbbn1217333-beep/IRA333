@@ -7,82 +7,161 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding: 8px; width: 900px; }
-.panel { background: linear-gradient(160deg, #2a1a00 0%, #3d2600 40%, #2a1a00 100%); border-radius: 12px; border: 3px solid #c88a2a; box-shadow: 0 0 0 1px #6b4200, 0 0 30px rgba(200,138,42,0.3), inset 0 1px 0 rgba(255,220,100,0.15); overflow: hidden; position: relative; }
-.panel::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 120px, rgba(0,0,0,0.04) 120px, rgba(0,0,0,0.04) 121px); pointer-events: none; z-index: 0; }
+body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding: 6px; width: 900px; }
 
-.header { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 16px 5px; background: linear-gradient(90deg, transparent, rgba(255,190,50,0.08), transparent); border-bottom: 2px solid #6b4200; }
-.header-title { font-size: 14px; font-weight: 900; color: #ffe680; text-shadow: 0 0 12px rgba(255,200,0,0.6), 2px 2px 0 rgba(0,0,0,0.6); letter-spacing: 2px; }
-.header-glove { font-size: 14px; display: inline-block; animation: punch 0.6s ease infinite alternate; }
+.panel {
+  background: linear-gradient(160deg, #2a1a00 0%, #3d2600 40%, #2a1a00 100%);
+  border-radius: 10px;
+  border: 2px solid #c88a2a;
+  box-shadow: 0 0 0 1px #6b4200, 0 0 24px rgba(200,138,42,0.3), inset 0 1px 0 rgba(255,220,100,0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 헤더 */
+.header {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 12px;
+  background: linear-gradient(90deg, transparent, rgba(255,190,50,0.07), transparent);
+  border-bottom: 1px solid #6b4200;
+}
+.header-title { font-size: 13px; font-weight: 900; color: #ffe680; text-shadow: 0 0 10px rgba(255,200,0,0.5), 1px 1px 0 rgba(0,0,0,0.6); letter-spacing: 2px; }
+.header-glove { font-size: 13px; display: inline-block; animation: punch 0.6s ease infinite alternate; }
 @keyframes punch { from { transform: scale(1) rotate(-15deg); } to { transform: scale(1.2) rotate(10deg); } }
 
-.hidden-controls { position: relative; z-index: 10; display: flex; justify-content: center; padding: 3px 10px; border-bottom: 1px solid rgba(107,66,0,0.4); }
-.toggle-btn { background: rgba(0,0,0,0.5); border: 1px solid #6b4200; border-radius: 5px; color: #c88a2a; font-size: 10px; font-weight: 700; padding: 2px 10px; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif; }
-.toggle-btn:hover { background: rgba(200,138,42,0.2); border-color: #c88a2a; color: #ffe680; }
-.toggle-btn.revealed { background: rgba(200,50,50,0.3); border-color: #ff6060; color: #ffaaaa; }
+/* 자물쇠 버튼 */
+.lock-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 18px; line-height: 1;
+  padding: 0 2px;
+  transition: transform 0.2s;
+  filter: drop-shadow(0 0 4px rgba(255,200,0,0.3));
+}
+.lock-btn:hover { transform: scale(1.2); }
 
-.round-summary { position: relative; z-index: 1; display: flex; gap: 5px; padding: 4px 10px; border-bottom: 1px solid rgba(107,66,0,0.6); }
-.round-badge { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid #6b4200; border-radius: 6px; padding: 3px 6px; text-align: center; }
-.round-badge .r-label { font-size: 9px; color: #c88a2a; font-weight: 700; letter-spacing: 1px; }
-.round-badge .r-winner { font-size: 11px; color: #ffe680; font-weight: 700; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 라운드 요약 */
+.round-summary {
+  position: relative; z-index: 1;
+  display: flex; gap: 4px;
+  padding: 4px 10px;
+  border-bottom: 1px solid rgba(107,66,0,0.5);
+}
+.round-badge {
+  flex: 1; background: rgba(0,0,0,0.3);
+  border: 1px solid #6b4200; border-radius: 5px;
+  padding: 2px 6px; text-align: center;
+}
+.round-badge .r-label { font-size: 8px; color: #c88a2a; font-weight: 700; letter-spacing: 0.5px; }
+.round-badge .r-winner { font-size: 10px; color: #ffe680; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.race-section { position: relative; z-index: 1; padding: 5px 10px; }
-.race-row { margin-bottom: 2px; animation: fadeSlide 0.4s ease both; }
-.race-row:nth-child(odd) { animation-delay: 0.00s; }
-@keyframes fadeSlide { from { opacity:0; transform: translateX(-16px); } to { opacity:1; transform: translateX(0); } }
+/* 메인 레이스 영역 */
+.race-section { position: relative; z-index: 1; padding: 4px 8px 2px; }
 
-.race-top { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
-.rank-badge { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; flex-shrink: 0; border: 2px solid; }
-.rank-1 { background: radial-gradient(circle, #ffe047, #c87000); color: #3a1a00; border-color: #ffcc00; box-shadow: 0 0 8px rgba(255,200,0,0.6); }
+.race-row { margin-bottom: 3px; }
+@keyframes fadeSlide { from { opacity:0; transform: translateX(-12px); } to { opacity:1; transform: translateX(0); } }
+.race-row:nth-child(1)  { animation: fadeSlide 0.35s 0.00s both; }
+.race-row:nth-child(3)  { animation: fadeSlide 0.35s 0.05s both; }
+.race-row:nth-child(5)  { animation: fadeSlide 0.35s 0.10s both; }
+.race-row:nth-child(7)  { animation: fadeSlide 0.35s 0.15s both; }
+.race-row:nth-child(9)  { animation: fadeSlide 0.35s 0.20s both; }
+.race-row:nth-child(11) { animation: fadeSlide 0.35s 0.25s both; }
+.race-row:nth-child(13) { animation: fadeSlide 0.35s 0.30s both; }
+
+/* 상단: 순위+이름+점수+라운드점수 */
+.race-top {
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 1px;
+}
+
+.rank-badge {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 900; flex-shrink: 0; border: 1px solid;
+}
+.rank-1 { background: radial-gradient(circle, #ffe047, #c87000); color: #3a1a00; border-color: #ffcc00; box-shadow: 0 0 6px rgba(255,200,0,0.5); }
 .rank-2 { background: radial-gradient(circle, #d0d8e0, #7a8a99); color: #1a2030; border-color: #b0bec5; }
 .rank-3 { background: radial-gradient(circle, #f0a070, #a04010); color: #2a0800; border-color: #cd7f32; }
 .rank-other { background: rgba(0,0,0,0.4); color: #a09060; border-color: #5a4020; }
 
-.avatar-wrap { width: 28px; height: 28px; flex-shrink: 0; }
-.avatar-wrap img { width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 2px solid; display: block; }
-.rank-1-border { border-color: #ffcc00 !important; box-shadow: 0 0 5px rgba(255,200,0,0.7); }
+.avatar-wrap { width: 24px; height: 24px; flex-shrink: 0; }
+.avatar-wrap img { width: 24px; height: 24px; object-fit: cover; border-radius: 3px; border: 1px solid; display: block; }
+.rank-1-border { border-color: #ffcc00 !important; box-shadow: 0 0 4px rgba(255,200,0,0.6); }
 .rank-2-border { border-color: #b0bec5 !important; }
 .rank-3-border { border-color: #cd7f32 !important; }
 .rank-o-border { border-color: #5a4020 !important; }
-.avatar-placeholder { width: 28px; height: 28px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 2px dashed #6b4200; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.avatar-placeholder { width: 24px; height: 24px; border-radius: 3px; background: rgba(0,0,0,0.3); border: 1px dashed #6b4200; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-.name-score { flex: 1; min-width: 0; }
-.streamer-name { font-size: 11px; font-weight: 700; color: #ffe680; text-shadow: 1px 1px 0 rgba(0,0,0,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.score-total { font-size: 13px; font-weight: 900; color: #fff; text-shadow: 0 0 8px rgba(255,200,0,0.4), 1px 1px 0 rgba(0,0,0,0.8); }
-.score-label { font-size: 9px; color: #c88a2a; margin-left: 1px; }
+.name-score { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; }
+.streamer-name { font-size: 11px; font-weight: 700; color: #ffe680; text-shadow: 1px 1px 0 rgba(0,0,0,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.score-total { font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 0 6px rgba(255,200,0,0.3); flex-shrink: 0; }
+.score-label { font-size: 8px; color: #c88a2a; margin-left: 1px; }
 
 .round-scores { display: flex; gap: 2px; margin-left: auto; flex-shrink: 0; }
-.rs-badge { background: rgba(0,0,0,0.4); border: 1px solid #5a4020; border-radius: 4px; padding: 2px 5px; text-align: center; min-width: 34px; }
-.rs-badge .rs-r { font-size: 7px; color: #a07840; font-weight: 700; }
-.rs-badge .rs-v { font-size: 10px; color: #e8d080; font-weight: 700; }
+.rs-badge { background: rgba(0,0,0,0.4); border: 1px solid #5a4020; border-radius: 3px; padding: 1px 4px; text-align: center; min-width: 30px; }
+.rs-badge .rs-r { font-size: 6px; color: #a07840; font-weight: 700; }
+.rs-badge .rs-v { font-size: 9px; color: #e8d080; font-weight: 700; }
 
-/* 트랙 - 캐릭터 270px, 트랙은 50px 높이 */
-.track-wrap { position: relative; height: 50px; overflow: visible; }
-.track-bg { position: absolute; top: 50%; transform: translateY(-50%); left: 0; right: 0; height: 12px; background: #1a1008; border-radius: 5px; border: 1px solid #4a3010; overflow: hidden; }
-.track-bg::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); left: 0; right: 0; height: 2px; background: repeating-linear-gradient(90deg, transparent, transparent 12px, rgba(255,200,0,0.15) 12px, rgba(255,200,0,0.15) 22px); }
+/* 트랙 */
+.track-wrap {
+  position: relative;
+  height: 44px; /* 캐릭터가 위아래로 넘쳐도 괜찮게 overflow visible */
+  overflow: visible;
+}
+.track-bg {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; right: 0; height: 10px;
+  background: #1a1008; border-radius: 5px; border: 1px solid #4a3010;
+  overflow: hidden;
+}
+.track-bg::after {
+  content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; right: 0; height: 1px;
+  background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,200,0,0.12) 10px, rgba(255,200,0,0.12) 18px);
+}
 .track-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 5px; transition: width 1s cubic-bezier(0.34,1.3,0.64,1); z-index: 1; }
-.fill-1 { background: linear-gradient(90deg, #c87000, #ffcc00, #ffe680); box-shadow: 0 0 5px rgba(255,180,0,0.6); }
+.fill-1 { background: linear-gradient(90deg, #c87000, #ffcc00, #ffe680); box-shadow: 0 0 4px rgba(255,180,0,0.5); }
 .fill-2 { background: linear-gradient(90deg, #5a6a7a, #b0bec5); }
 .fill-3 { background: linear-gradient(90deg, #7a3010, #cd7f32); }
 .fill-o { background: linear-gradient(90deg, #3a2800, #6b4200); }
-.finish-line { position: absolute; right: 0; top: 0; height: 100%; width: 8px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 4px); border-radius: 0 5px 5px 0; opacity: 0.6; z-index: 2; }
+.finish-line { position: absolute; right: 0; top: 0; height: 100%; width: 7px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 4px); border-radius: 0 5px 5px 0; opacity: 0.5; z-index: 2; }
 
-/* 캐릭터 270px, overflow:visible 으로 칸 넘어서 보이게 */
-.runner-icon { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 270px; height: 270px; z-index: 100; transition: left 1s cubic-bezier(0.34,1.3,0.64,1); pointer-events: none; }
-.runner-icon img { width: 270px; height: 270px; object-fit: cover; border-radius: 4px; border: 2px solid rgba(255,200,0,0.5); image-rendering: pixelated; }
-.runner-placeholder { width: 270px; height: 270px; border-radius: 4px; background: rgba(200,138,42,0.3); border: 1px solid #c88a2a; display: flex; align-items: center; justify-content: center; font-size: 60px; }
-.runner-icon.is-first::after { content: '⭐'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 11px; animation: bounce 0.8s ease infinite alternate; }
-@keyframes bounce { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-4px); } }
+/* 캐릭터: 네모칸 없음, gif만 원형 마스크 */
+.runner-icon {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 40px; height: 40px;
+  z-index: 10;
+  transition: left 1s cubic-bezier(0.34,1.3,0.64,1);
+  pointer-events: none;
+}
+.runner-icon img {
+  width: 40px; height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  image-rendering: pixelated;
+  /* 네모칸 제거: 배경 없음, 테두리 없음 */
+}
+.runner-icon.is-first::after {
+  content: '⭐'; position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%); font-size: 9px;
+  animation: bounce 0.8s ease infinite alternate;
+}
+@keyframes bounce { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-3px); } }
 
-.row-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(107,66,0,0.35), transparent); }
+.row-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(107,66,0,0.3), transparent); margin-bottom: 3px; }
 
-.divider { height: 1px; background: linear-gradient(90deg, transparent, #6b4200, transparent); margin: 0 10px; position: relative; z-index: 1; }
-.footer { position: relative; z-index: 1; display: flex; align-items: center; justify-content: flex-end; padding: 3px 12px 5px; gap: 5px; }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #4cff80; box-shadow: 0 0 5px rgba(76,255,128,0.8); animation: pulse 1.5s ease infinite; }
+.footer {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 2px 10px 5px; gap: 4px;
+}
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #4cff80; box-shadow: 0 0 4px rgba(76,255,128,0.8); animation: pulse 1.5s ease infinite; }
 @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.8); } }
-.live-text { font-size: 10px; color: #4cff80; font-weight: 700; letter-spacing: 1px; }
-.update-time { font-size: 9px; color: #6b5030; margin-left: 4px; }
-.empty { padding: 20px; text-align: center; color: #6b4200; font-size: 13px; position: relative; z-index: 1; }
+.live-text { font-size: 9px; color: #4cff80; font-weight: 700; letter-spacing: 1px; }
+.update-time { font-size: 8px; color: #6b5030; margin-left: 3px; }
+.empty { padding: 16px; text-align: center; color: #6b4200; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -90,11 +169,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <div class="header">
     <span class="header-glove">🥊</span>
     <span class="header-title">이라333배 개맞짱 컨텐츠</span>
-    <span class="header-glove">🥊</span>
-  </div>
-
-  <div class="hidden-controls">
-    <button class="toggle-btn" id="toggleBtn" onclick="toggleRound3()">🔒 3라운드 공개</button>
+    <button class="lock-btn" id="lockBtn" onclick="toggleRound3()" title="3라운드 공개/숨김">🔒</button>
   </div>
 
   <div class="round-summary" id="roundSummary" style="display:none">
@@ -106,49 +181,43 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <div class="race-section" id="raceSection">
     <div class="empty">📡 데이터 로딩 중...</div>
   </div>
-  <div class="divider"></div>
+
   <div class="footer">
     <div class="live-dot"></div>
     <span class="live-text">LIVE</span>
     <span class="update-time" id="updateTime">-</span>
   </div>
 </div>
+
 <script>
 const SHEET_ID   = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
-const SHEET_NAME = "시트1!E11:I17";
+const SHEET_NAME = "시트1!E12:I18";
 let prevJSON = "";
 let round3Revealed = false;
 
 function toggleRound3() {
   round3Revealed = !round3Revealed;
-  const btn = document.getElementById("toggleBtn");
+  const btn = document.getElementById("lockBtn");
   const badge = document.getElementById("r3badge");
-
   if (round3Revealed) {
-    btn.textContent = "🔓 3라운드 숨기기";
-    btn.classList.add("revealed");
+    btn.textContent = "🔓";
     badge.style.display = "";
     document.querySelectorAll(".rs-r3").forEach(el => el.style.display = "");
   } else {
-    btn.textContent = "🔒 3라운드 공개";
-    btn.classList.remove("revealed");
+    btn.textContent = "🔒";
     badge.style.display = "none";
     document.querySelectorAll(".rs-r3").forEach(el => el.style.display = "none");
   }
 }
 
 function getImgFile(name, rank) {
-  if (name === "이라333") {
-    return rank <= 3 ? "/images/default.gif" : "/images/이라333.gif";
-  }
+  if (name === "이라333") return rank <= 3 ? "/images/default.gif" : "/images/이라333.gif";
   return "/images/default.gif";
 }
 
 function getRoundWinner(data, key) {
   if (!data.length) return "-";
-  return data.reduce((best, r) =>
-    Number(r[key]) > Number(best[key]) ? r : best
-  )["🎙️스트리머"] || "-";
+  return data.reduce((best, r) => Number(r[key]) > Number(best[key]) ? r : best)["🎙️스트리머"] || "-";
 }
 
 function render(data) {
@@ -172,23 +241,23 @@ function render(data) {
   document.getElementById("r2winner").textContent = getRoundWinner(data, "🥊2세트");
   document.getElementById("r3winner").textContent = getRoundWinner(data, "🥊3세트");
 
-  const section = document.getElementById("raceSection");
-  section.innerHTML = "";
-
   const rankFillClass   = ["fill-1","fill-2","fill-3","fill-o","fill-o","fill-o","fill-o"];
   const rankBadgeClass  = ["rank-1","rank-2","rank-3","rank-other","rank-other","rank-other","rank-other"];
   const rankBorderClass = ["rank-1-border","rank-2-border","rank-3-border","rank-o-border","rank-o-border","rank-o-border","rank-o-border"];
 
+  const section = document.getElementById("raceSection");
+  section.innerHTML = "";
+
   data.forEach((row, i) => {
-    const rank  = i + 1;
-    const name  = row["🎙️스트리머"] || "?";
-    const total = Number(row["📝최종 점수"]) || 0;
-    const s1    = row["🥊1세트"] || "-";
-    const s2    = row["🥊2세트"] || "-";
-    const s3    = row["🥊3세트"] || "-";
-    const pct   = maxScore > 0 ? Math.min(94, Math.max(4, (total / maxScore) * 90)) : 4;
+    const rank    = i + 1;
+    const name    = row["🎙️스트리머"] || "?";
+    const total   = Number(row["📝최종 점수"]) || 0;
+    const s1      = row["🥊1세트"] || "-";
+    const s2      = row["🥊2세트"] || "-";
+    const s3      = row["🥊3세트"] || "-";
+    const pct     = maxScore > 0 ? Math.min(93, Math.max(5, (total / maxScore) * 88)) : 5;
     const imgFile = getImgFile(name, rank);
-    const r3disp = round3Revealed ? "" : "display:none";
+    const r3disp  = round3Revealed ? "" : "display:none";
 
     const div = document.createElement("div");
     div.className = "race-row";
@@ -199,8 +268,8 @@ function render(data) {
           '<img src="' + imgFile + '" class="' + rankBorderClass[i] + '" onerror="this.outerHTML=\'<div class=&quot;avatar-placeholder&quot;>🧙</div>\'" alt="' + name + '">' +
         '</div>' +
         '<div class="name-score">' +
-          '<div class="streamer-name">' + name + '</div>' +
-          '<div><span class="score-total">' + total.toLocaleString() + '</span><span class="score-label">pt</span></div>' +
+          '<span class="streamer-name">' + name + '</span>' +
+          '<span class="score-total">' + total.toLocaleString() + '</span><span class="score-label">pt</span>' +
         '</div>' +
         '<div class="round-scores">' +
           '<div class="rs-badge"><div class="rs-r">1라운드</div><div class="rs-v">' + s1 + '</div></div>' +
@@ -214,7 +283,7 @@ function render(data) {
           '<div class="finish-line"></div>' +
         '</div>' +
         '<div class="runner-icon' + (rank === 1 ? ' is-first' : '') + '" style="left:' + pct + '%">' +
-          '<img src="' + imgFile + '" onerror="this.outerHTML=\'<div class=&quot;runner-placeholder&quot;>🏃</div>\'" alt="' + name + '">' +
+          '<img src="' + imgFile + '" onerror="this.style.display=\'none\'" alt="">' +
         '</div>' +
       '</div>';
 
@@ -251,6 +320,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
