@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="referrer" content="no-referrer">
 <title>이라333배 메이플 개맞짱 컨텐츠</title>
+<link rel="icon" href="https://i.postimg.cc/d1w9vSmS/seukeulinsyas-2025-12-18-180217.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
@@ -181,12 +182,17 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   animation: boxPop 0.5s cubic-bezier(0.34,1.6,0.64,1) both;
 }
 @keyframes boxPop { from { transform: translate(-50%,-50%) scale(0.3) rotate(-8deg); opacity:0; } to { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; } }
+@keyframes winnerGlow {
+  0%   { box-shadow: 0 0 20px rgba(255,200,0,0.9), 0 0 50px rgba(255,150,0,0.5), 0 0 0px rgba(255,255,100,0); border-color: #ffcc00; }
+  50%  { box-shadow: 0 0 40px rgba(255,220,0,1), 0 0 80px rgba(255,160,0,0.9), 0 0 120px rgba(255,255,100,0.6); border-color: #ffffff; }
+  100% { box-shadow: 0 0 20px rgba(255,200,0,0.9), 0 0 50px rgba(255,150,0,0.5), 0 0 0px rgba(255,255,100,0); border-color: #ffcc00; }
+}
 .celeb-char {
   width: 480px; height: 480px; object-fit: contain; border-radius: 12px;
   transform: scaleX(-1);
-  border: 3px solid #ffcc00;
-  box-shadow: 0 0 20px rgba(255,200,0,0.9), 0 0 50px rgba(255,150,0,0.5);
+  border: 4px solid #ffcc00;
   image-rendering: auto;
+  animation: winnerGlow 1.2s ease-in-out infinite;
 }
 .celeb-title {
   font-size: 46px; font-weight: 800; color: #ffe680;
@@ -494,7 +500,7 @@ function spawnFlyingChars() {
 
   targets.forEach((avatarEl, idx) => {
     // 시작 X: count명을 균등 분산
-    const startX = overlayW * 0.30 + idx * (overlayW * 0.40 / Math.max(count - 1, 1));
+    const startX = overlayW * 0.35 + idx * (overlayW * 0.30 / Math.max(count - 1, 1));
     const startY = overlayH + 80;
 
     const img = document.createElement("img");
@@ -504,7 +510,7 @@ function spawnFlyingChars() {
       ? buildUrl(sname, "A40", 0, "E03")
       : avatarEl.src;
 
-    const fx = rand(-30, 30);  // 좌우 이동 최소화
+    const fx = rand(-20, 20);
     const fy = -(overlayH + 250);
     const fr = rand(-40, 40);
     const fd = rand(3.0, 4.2);
@@ -513,7 +519,7 @@ function spawnFlyingChars() {
     img.style.cssText =
       "left:" + startX + "px;" +
       "top:" + startY + "px;" +
-      "width:400px;height:400px;" +
+      "width:600px;height:600px;" +
       "object-fit:contain;" +
       "transform:translate(-50%,-50%) scaleX(-1);" +
       "animation-delay:" + delay + "s;" +
@@ -669,6 +675,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
