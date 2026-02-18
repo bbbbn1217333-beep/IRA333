@@ -436,9 +436,8 @@ body {
 
 <script>
 const SHEET_ID   = "18F2mJsiSWYbxSl97u4vKEX9pTuEOuoL1WaGE5PB_iJ0";
-// 변경 후 - RANGE를 SHEET_NAME에 포함시키기
-const SHEET_NAME = "시트1!E11:I15";
-const RANGE      = "";
+const SHEET_NAME = "시트1";
+const RANGE      = "E11:I15";
 
 let prevJSON = "";
 
@@ -542,7 +541,7 @@ function render(data) {
 
 // ─── 데이터 패치 ───
 async function fetchData() {
-  const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}`;
+  const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}!${RANGE}`;
   try {
     const res  = await fetch(url);
     const data = await res.json();
@@ -558,6 +557,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
