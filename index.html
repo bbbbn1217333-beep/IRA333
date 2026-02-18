@@ -129,7 +129,6 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .fill-3 { background: linear-gradient(90deg, #7a3010, #cd7f32); }
 .fill-o { background: linear-gradient(90deg, #3a2800, #6b4200); }
 
-/* 완주 시 1등 게이지: 눈부신 황금색, 한 번만 애니 후 정지 */
 @keyframes goldenFlash {
   0%   { filter: brightness(1) saturate(1); }
   40%  { filter: brightness(3) saturate(2.5); }
@@ -149,7 +148,6 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   position: absolute; top: 50%; transform: translate(-50%, -100%);
   width: 32px; height: 32px;
   z-index: 10; pointer-events: none;
-  /* transition 없음: JS easing 애니메이션으로 직접 제어 */
 }
 .runner-icon img {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scaleX(-1);
@@ -164,7 +162,6 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 @keyframes bounce { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-3px); } }
 
-/* 완주 시 비우승자 캐릭터 페이드 */
 .avatar-img.frozen { opacity: 0.45; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)) grayscale(0.6); }
 .runner-icon.frozen img { opacity: 0.4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) grayscale(0.6); }
 
@@ -314,6 +311,26 @@ function startAvatarAnim(imgEl, name, rank) {
   }, 300);
 }
 
+// ★ celebChar 전용 애니 — activeAnims["__celeb__"]로 별도 관리
+function startCelebAnim(name) {
+  const imgEl = document.getElementById("celebChar");
+  if (!imgEl || !STREAMERS[name]) return;
+  // 기존 celeb 애니 중지
+  if (activeAnims["__celeb__"]) { clearInterval(activeAnims["__celeb__"]); delete activeAnims["__celeb__"]; }
+  const anim = RANK_ANIM["cheer"]; // 우승자는 항상 cheer
+  let frame = 0;
+  imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
+  frame = (frame + 1) % anim.frames;
+  activeAnims["__celeb__"] = setInterval(() => {
+    imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
+    frame = (frame + 1) % anim.frames;
+  }, 300);
+}
+
+function stopCelebAnim() {
+  if (activeAnims["__celeb__"]) { clearInterval(activeAnims["__celeb__"]); delete activeAnims["__celeb__"]; }
+}
+
 function startRunnerAnim(imgEl, name) {
   const key = "runner_" + name;
   if (activeAnims[key]) { clearInterval(activeAnims[key]); delete activeAnims[key]; }
@@ -333,7 +350,7 @@ let celebActive = false;
 let celebTimer = null;
 let currentFirstName = "";
 let finishTriggered = false;
-let finishApplied = false; // ★ 게이지바 한 번만 실행 플래그
+let finishApplied = false;
 
 function toggleRound3() {
   round3Revealed = !round3Revealed;
@@ -342,21 +359,14 @@ function toggleRound3() {
   document.querySelectorAll(".rs-r3").forEach(el => el.style.display = round3Revealed ? "" : "none");
 }
 
-// JS로 runner-icon left를 easing에 맞춰 직접 애니메이션
 function animateRunnerToEnd(runnerEl, duration) {
-  const startPct = 0; // ★ 항상 0%에서 시작 (게이지바와 완전 동기화)
+  const startPct = 0;
   const endPct = 100;
   const startTime = performance.now();
-  // ease-in (느릿) → ease-out (확 빠름): cubic-bezier 흉내
-  // t를 0~1로 받아서 처음엔 slow, 70% 이후 급가속
   function easeInExpo(t) {
-    // 0~0.65: 거의 안움직임, 0.65~1: 급가속
-    if (t < 0.65) {
-      return (t / 0.65) * 0.15; // 65% 시간 동안 15%만 이동
-    } else {
-      const t2 = (t - 0.65) / 0.35;
-      return 0.15 + 0.85 * (t2 * t2 * t2); // 나머지 85% 급가속
-    }
+    if (t < 0.65) return (t / 0.65) * 0.15;
+    const t2 = (t - 0.65) / 0.35;
+    return 0.15 + 0.85 * (t2 * t2 * t2);
   }
   function step(now) {
     const elapsed = now - startTime;
@@ -369,7 +379,6 @@ function animateRunnerToEnd(runnerEl, duration) {
   requestAnimationFrame(step);
 }
 
-// 게이지바도 JS로 직접 easing 애니메이션
 function animateGaugeFill(fillEl, duration) {
   const startPct = 0;
   const endPct = 100;
@@ -390,7 +399,6 @@ function animateGaugeFill(fillEl, duration) {
 }
 
 function applyFinishEffects(winnerName) {
-  // ★ 이미 적용됐으면 재실행 안 함
   if (finishApplied) return;
   finishApplied = true;
 
@@ -398,11 +406,9 @@ function applyFinishEffects(winnerName) {
   const firstRunner = document.querySelector(".runner-icon.is-first");
 
   if (fill1) {
-    // transition 완전히 끄고 0%에서 시작
     fill1.style.transition = "none";
     fill1.style.width = "0%";
     fill1.classList.add("finish-glow");
-    // JS easing 애니메이션으로 게이지 채움 (3초)
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         animateGaugeFill(fill1, 3000);
@@ -410,7 +416,6 @@ function applyFinishEffects(winnerName) {
     });
   }
 
-  // runner도 0%에서 시작해서 게이지바와 완전히 동기화 (3초)
   if (firstRunner) {
     firstRunner.style.transition = "none";
     firstRunner.style.left = "0%";
@@ -421,8 +426,9 @@ function applyFinishEffects(winnerName) {
     });
   }
 
-  // 모든 캐릭터 애니 멈추기
+  // ★ celeb 애니를 제외한 나머지만 정리
   Object.keys(activeAnims).forEach(k => {
+    if (k === "__celeb__") return; // celebChar 애니는 건드리지 않음
     clearInterval(activeAnims[k]);
     delete activeAnims[k];
   });
@@ -435,14 +441,14 @@ function applyFinishEffects(winnerName) {
     if (i !== 0) el.classList.add("frozen");
   });
 
-  // 우승자 avatar만 애니 재시작
+  // 우승자 리스트 avatar만 애니 재시작
   const winnerAvatar = document.getElementById("avatar_0");
   if (winnerAvatar && winnerName) startAvatarAnim(winnerAvatar, winnerName, 1);
 }
 
 function clearFinishEffects() {
   finishTriggered = false;
-  finishApplied = false; // ★ 플래그 초기화
+  finishApplied = false;
   document.querySelectorAll(".track-fill").forEach(el => el.classList.remove("finish-glow"));
   document.querySelectorAll(".avatar-img").forEach(el => el.classList.remove("frozen"));
   document.querySelectorAll(".runner-icon").forEach(el => el.classList.remove("frozen"));
@@ -453,6 +459,7 @@ function triggerFinish() {
     celebActive = false;
     clearInterval(window._celebInterval);
     clearTimeout(celebTimer);
+    stopCelebAnim(); // ★ celeb 애니 중지
     document.getElementById("celebOverlay").classList.remove("active");
     document.getElementById("finishBtn").classList.remove("active");
     document.getElementById("finishBtn").textContent = "🏆 완주!";
@@ -462,20 +469,24 @@ function triggerFinish() {
 
   celebActive = true;
   finishTriggered = true;
-  finishApplied = false; // ★ 새로 누를 때마다 초기화해서 한 번 실행 보장
+  finishApplied = false;
   document.getElementById("finishBtn").classList.add("active");
   document.getElementById("finishBtn").textContent = "⏹ 종료";
   document.getElementById("celebWinner").textContent = currentFirstName || "";
-  startAvatarAnim(document.getElementById("celebChar"), currentFirstName, 1);
+
+  // ★ celebChar 움짤 시작 (overlay 표시 전에 먼저)
+  startCelebAnim(currentFirstName);
+
   document.getElementById("celebOverlay").classList.add("active");
 
-  spawnFlyingChars(); // ★ applyFinishEffects 전에 호출해야 avatar src가 살아있음
+  spawnFlyingChars();
   applyFinishEffects(currentFirstName);
   spawnBurst();
   window._celebInterval = setInterval(() => { if (celebActive) spawnBurst(); }, 600);
   celebTimer = setTimeout(() => {
     celebActive = false;
     clearInterval(window._celebInterval);
+    stopCelebAnim(); // ★ 타임아웃 종료 시도 celeb 애니 중지
     document.getElementById("celebOverlay").classList.remove("active");
     document.getElementById("finishBtn").classList.remove("active");
     document.getElementById("finishBtn").textContent = "🏆 완주!";
@@ -488,18 +499,15 @@ function spawnFlyingChars() {
   const overlayH = overlay.offsetHeight;
   const overlayW = overlay.offsetWidth;
 
-  // avatar_1부터 존재하는 것만 전부 수집
   const targets = [];
   for (let i = 1; i <= 10; i++) {
     const el = document.getElementById("avatar_" + i);
     if (el) targets.push(el);
   }
   const count = targets.length;
-  console.log("🚀 날릴 캐릭터 수:", count, targets.map(e => e.dataset.sname));
   if (count === 0) return;
 
   targets.forEach((avatarEl, idx) => {
-    // 시작 X: count명을 균등 분산
     const startX = overlayW * 0.25 + idx * (overlayW * 0.20 / Math.max(count - 1, 1));
     const startY = overlayH + 80;
 
@@ -579,18 +587,15 @@ function render(data) {
   data = data.slice(0, 7);
   const json = JSON.stringify(data);
 
-  if (json === prevJSON) {
-    // ★ 데이터 동일 → 게이지 재실행 절대 안 함 (finishApplied가 true면 skip)
-    return;
-  }
+  if (json === prevJSON) return;
 
-  // 수치 바뀌면 완주 효과 해제
   if (finishTriggered) {
     clearFinishEffects();
     if (celebActive) {
       celebActive = false;
       clearInterval(window._celebInterval);
       clearTimeout(celebTimer);
+      stopCelebAnim();
       document.getElementById("celebOverlay").classList.remove("active");
       document.getElementById("finishBtn").classList.remove("active");
       document.getElementById("finishBtn").textContent = "🏆 완주!";
@@ -613,7 +618,11 @@ function render(data) {
   const rankFillClass  = ["fill-1","fill-2","fill-3","fill-o","fill-o","fill-o","fill-o"];
   const rankBadgeClass = ["rank-1","rank-2","rank-3","rank-other","rank-other","rank-other","rank-other"];
   const section = document.getElementById("raceSection");
-  Object.keys(activeAnims).forEach(k => { clearInterval(activeAnims[k]); delete activeAnims[k]; });
+  Object.keys(activeAnims).forEach(k => {
+    if (k === "__celeb__") return;
+    clearInterval(activeAnims[k]);
+    delete activeAnims[k];
+  });
   section.innerHTML = "";
 
   data.forEach((row, i) => {
@@ -675,6 +684,7 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
 
 
 
