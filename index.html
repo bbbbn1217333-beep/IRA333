@@ -109,65 +109,85 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .score-label { font-size: 13px; color: #c82a2a; margin-left: 1px; font-weight: 700; }
 .round-scores { display: flex; gap: 3px; margin-left: auto; flex-shrink: 0; }
 .rs-badge { background: rgba(0,0,0,0.4); border: 1px solid #5a2020; border-radius: 4px; padding: 1px 7px; text-align: center; min-width: 46px; }
-.rs-badge .rs-r { font-size: 11px; color: #c82a2a; font-weight: 700; }
-.rs-badge .rs-v { font-size: 18px; color: #ffb3b3; font-weight: 900; }
+.rs-badge .rs-r { font-size: 11px; color: #c82a2a; font-weight: 700; display: block; }
+.rs-badge .rs-v { font-size: 18px; color: #ffb3b3; font-weight: 900; display: block; }
 
 /* ── 3라운드 뱃지 임팩트 이펙트 (GPU 가속) ── */
 .rs-badge.rs-r3 {
   position: relative;
   will-change: transform, opacity;
   overflow: hidden;
+  /* 애니메이션 전 기본 상태 */
+  transform: translateZ(0);
 }
 
+/* 위치/크기만 담당 - transform+opacity만 써서 compositor에서 처리 */
 @keyframes r3FlyIn {
-  0%   { transform: translateX(80px) scale(1.8); opacity: 0; filter: blur(4px) brightness(4); }
-  45%  { transform: translateX(-5px) scale(0.93); opacity: 1; filter: blur(0) brightness(2.5); }
-  62%  { transform: translateX(3px) scale(1.06); filter: brightness(1.8); }
-  78%  { transform: translateX(-1px) scale(0.98); filter: brightness(1.3); }
-  90%  { transform: translateX(1px) scale(1.01); }
-  100% { transform: translateX(0) scale(1); filter: brightness(1); }
+  0%   { transform: translateX(60px) scale(1.5) translateZ(0); opacity: 0; }
+  50%  { transform: translateX(-3px) scale(0.95) translateZ(0); opacity: 1; }
+  70%  { transform: translateX(2px) scale(1.04) translateZ(0); }
+  85%  { transform: translateX(-1px) scale(0.99) translateZ(0); }
+  100% { transform: translateX(0) scale(1) translateZ(0); opacity: 1; }
 }
 
-@keyframes r3Flash {
-  0%   { background: rgba(255,60,60,0.8);  border-color: #fff;    box-shadow: 0 0 20px 6px rgba(255,50,50,0.9), 0 0 40px 12px rgba(200,0,0,0.6); }
-  25%  { background: rgba(150,0,0,0.7);    border-color: #ff8080; box-shadow: 0 0 14px 4px rgba(255,40,40,0.7); }
-  60%  { background: rgba(70,0,0,0.55);    border-color: #ff3333; box-shadow: 0 0 10px 3px rgba(255,30,30,0.55); }
-  100% { background: rgba(45,0,0,0.5);     border-color: #ff1f1f; box-shadow: 0 0 7px 2px rgba(255,20,20,0.45), inset 0 0 8px rgba(255,20,20,0.12); }
+/* 배경/테두리 변화는 ::after 레이어에서 따로 처리 */
+.rs-badge.rs-r3::after {
+  content: '';
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.rs-badge.rs-r3.r3-impact::after {
+  opacity: 1;
+  background: rgba(255,60,60,0.7);
+  animation: r3FlashLayer 0.75s ease forwards;
+}
+@keyframes r3FlashLayer {
+  0%   { background: rgba(255,60,60,0.7); box-shadow: 0 0 14px 4px rgba(255,50,50,0.7); }
+  30%  { background: rgba(140,0,0,0.6);   box-shadow: 0 0 9px 2px rgba(255,40,40,0.5); }
+  70%  { background: rgba(60,0,0,0.45);   box-shadow: 0 0 6px 2px rgba(255,25,25,0.3); }
+  100% { background: rgba(45,0,0,0.0);    box-shadow: none; opacity: 0; }
 }
 
+/* 스윕 라인 - ::before로 분리 유지 */
 .rs-badge.rs-r3.r3-impact::before {
   content: '';
   position: absolute; left: -10%; right: -10%; top: -2px;
   height: 110%;
   background: linear-gradient(180deg,
-    rgba(255,100,100,0.0) 0%,
-    rgba(255,80,80,0.5)  45%,
-    rgba(255,200,200,0.9) 50%,
-    rgba(255,80,80,0.5)  55%,
-    rgba(255,100,100,0.0) 100%
+    transparent 0%,
+    rgba(255,180,180,0.6) 48%,
+    rgba(255,220,220,0.85) 50%,
+    rgba(255,180,180,0.6) 52%,
+    transparent 100%
   );
-  transform: translateY(-100%);
-  animation: r3Sweep 0.35s ease-out forwards;
+  transform: translateY(-100%) translateZ(0);
+  animation: r3Sweep 0.3s 0.05s ease-out forwards;
   z-index: 5; pointer-events: none;
+  will-change: transform;
 }
 @keyframes r3Sweep {
-  from { transform: translateY(-100%); }
-  to   { transform: translateY(200%); }
+  from { transform: translateY(-100%) translateZ(0); }
+  to   { transform: translateY(200%) translateZ(0); }
 }
 
 @keyframes r3TextPop {
-  0%   { opacity:0; transform:scale(0.4); filter:blur(3px); }
-  55%  { opacity:1; transform:scale(1.2); filter:blur(0); }
-  80%  { transform:scale(0.96); }
-  100% { transform:scale(1); opacity:1; }
+  0%   { opacity: 0; transform: scale(0.5) translateZ(0); }
+  60%  { opacity: 1; transform: scale(1.15) translateZ(0); }
+  80%  { transform: scale(0.97) translateZ(0); }
+  100% { transform: scale(1) translateZ(0); opacity: 1; }
 }
 
 .rs-badge.rs-r3.r3-impact {
-  animation: r3FlyIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards,
-             r3Flash 0.7s 0.12s ease forwards;
+  animation: r3FlyIn 0.48s cubic-bezier(0.22,1,0.36,1) forwards;
+  border-color: #ff6060;
+  transition: border-color 0.6s ease;
 }
-.rs-badge.rs-r3.r3-impact .rs-r { animation: r3TextPop 0.38s 0.18s cubic-bezier(0.34,1.6,0.64,1) both; }
-.rs-badge.rs-r3.r3-impact .rs-v { animation: r3TextPop 0.42s 0.25s cubic-bezier(0.34,1.6,0.64,1) both; }
+.rs-badge.rs-r3.r3-impact .rs-r { animation: r3TextPop 0.35s 0.15s cubic-bezier(0.34,1.5,0.64,1) both; }
+.rs-badge.rs-r3.r3-impact .rs-v { animation: r3TextPop 0.38s 0.22s cubic-bezier(0.34,1.5,0.64,1) both; }
 
 @keyframes r3Sizzle {
   0%,100% { box-shadow: 0 0 7px 2px rgba(255,25,25,0.45), inset 0 0 8px rgba(255,20,20,0.12); }
@@ -182,15 +202,16 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .rs-badge.rs-r3.r3-done .rs-v { color: #ffd5d5; text-shadow: 0 0 7px rgba(255,70,70,0.65); }
 
 @keyframes r3BadgeHeaderIn {
-  0%   { transform: scaleX(0); opacity:0; filter: blur(4px) brightness(4); }
-  50%  { transform: scaleX(1.08); opacity:1; filter: brightness(2.5); }
-  70%  { transform: scaleX(0.97); filter: brightness(1.6); }
-  85%  { transform: scaleX(1.02); }
-  100% { transform: scaleX(1); filter: brightness(1); }
+  0%   { transform: scaleX(0) translateZ(0); opacity: 0; }
+  55%  { transform: scaleX(1.06) translateZ(0); opacity: 1; }
+  75%  { transform: scaleX(0.97) translateZ(0); }
+  90%  { transform: scaleX(1.01) translateZ(0); }
+  100% { transform: scaleX(1) translateZ(0); opacity: 1; }
 }
 #r3badge.r3-header-in {
-  animation: r3BadgeHeaderIn 0.55s cubic-bezier(0.22,1,0.36,1) forwards,
-             r3Flash 0.65s 0.12s ease forwards;
+  animation: r3BadgeHeaderIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+  border-color: #ff6060;
+  will-change: transform, opacity;
 }
 #r3badge.r3-header-done {
   border-color: #ff1f1f !important;
@@ -624,7 +645,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   font-weight: 900;
   line-height: 1;
   opacity: 0;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
 }
 
 /* 일반 글자: 흰색 */
@@ -667,31 +688,26 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   0%   {
     opacity: 0;
     transform: translateY(40px) rotate(var(--tilt)) scale(0.3);
-    filter: blur(6px) brightness(6);
-    text-shadow: 0 0 30px #ff4400, 0 0 60px #ff0000;
   }
   35%  {
     opacity: 1;
     transform: translateY(-10px) rotate(calc(var(--tilt) * -0.4)) scale(1.25);
-    filter: blur(1px) brightness(3);
   }
   55%  {
     transform: translateY(4px) rotate(calc(var(--tilt) * 0.1)) scale(0.95);
-    filter: blur(0) brightness(1.8);
   }
   72%  {
     transform: translateY(-3px) scale(1.05);
-    filter: brightness(1.4);
   }
-  88%  { transform: translateY(1px) scale(0.99); filter: brightness(1.1); }
-  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; filter: brightness(1); }
+  88%  { transform: translateY(1px) scale(0.99); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
 }
 
 /* 강조 글자는 더 화끈하게 추가 잔광 */
 @keyframes charFireSettle {
-  0%   { color: #ffffff; text-shadow: 0 0 20px #ffffff, 0 0 40px #ff4444, 0 0 80px rgba(255,50,50,0.6); filter: brightness(2); }
-  40%  { color: #ffffff; text-shadow: 0 0 8px #ffffff, 0 0 18px rgba(255,100,100,0.9), 0 0 36px rgba(200,0,0,0.5); filter: brightness(1.3); }
-  100% { color: #ffffff; text-shadow: 0 0 2px rgba(255,255,255,1), 0 0 8px rgba(255,100,100,0.9), 0 0 20px rgba(255,50,50,0.7), 0 0 40px rgba(200,0,0,0.4); filter: brightness(1); }
+  0%   { color: #ffffff; text-shadow: 0 0 20px #ffffff, 0 0 40px #ff4444, 0 0 80px rgba(255,50,50,0.6); }
+  40%  { color: #ffffff; text-shadow: 0 0 8px #ffffff, 0 0 18px rgba(255,100,100,0.9), 0 0 36px rgba(200,0,0,0.5); }
+  100% { color: #ffffff; text-shadow: 0 0 2px rgba(255,255,255,1), 0 0 8px rgba(255,100,100,0.9), 0 0 20px rgba(255,50,50,0.7), 0 0 40px rgba(200,0,0,0.4); }
 }
 
 .cs-char.fire.risen {
@@ -1661,12 +1677,13 @@ function revealR3Badges() {
   const r3b = document.getElementById("r3badge");
   r3b.style.display = "";
   r3b.classList.remove("r3-header-done", "r3-header-in");
-  void r3b.offsetWidth;
-  r3b.classList.add("r3-header-in");
-  setTimeout(() => {
-    r3b.classList.remove("r3-header-in");
-    r3b.classList.add("r3-header-done");
-  }, 700);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    r3b.classList.add("r3-header-in");
+    setTimeout(() => {
+      r3b.classList.remove("r3-header-in");
+      r3b.classList.add("r3-header-done");
+    }, 700);
+  }));
 
   // 각 플레이어 뱃지 — 순차 등장 (DOM 조작 없음, CSS만)
   const badges = document.querySelectorAll(".rs-badge.rs-r3");
@@ -1676,12 +1693,13 @@ function revealR3Badges() {
     el.style.opacity = "0";
     setTimeout(() => {
       el.style.opacity = "";
-      void el.offsetWidth;
-      el.classList.add("r3-impact");
-      setTimeout(() => {
-        el.classList.remove("r3-impact");
-        el.classList.add("r3-done");
-      }, 750);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.classList.add("r3-impact");
+        setTimeout(() => {
+          el.classList.remove("r3-impact");
+          el.classList.add("r3-done");
+        }, 750);
+      }));
     }, i * 110);
   });
 }
@@ -2122,6 +2140,7 @@ setInterval(fetchData, 5000);
 </div>
 </body>
 </html>
+
 
 
 
