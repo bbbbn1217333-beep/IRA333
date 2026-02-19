@@ -253,6 +253,94 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .runner-icon.frozen img { opacity: 0.4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) grayscale(0.6); }
 
 .row-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(107,0,0,0.3), transparent); margin-bottom: 1px; }
+/* ── 두구두구 빌드업 오버레이 ── */
+#drumrollOverlay {
+  display: none; position: absolute; inset: 0;
+  z-index: 19999; pointer-events: none;
+  border-radius: 10px; overflow: hidden;
+}
+#drumrollOverlay.active { display: block; }
+
+/* 배경 어둠 */
+#drumrollBg {
+  position: absolute; inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 10px;
+}
+
+/* 가장자리 빨간 비네트 - 두구두구 박자에 맞춰 펄스 */
+#drumrollVignette {
+  position: absolute; inset: 0; border-radius: 10px;
+  box-shadow: inset 0 0 0px 0px rgba(200,0,0,0);
+  opacity: 0;
+}
+@keyframes vignetteThump {
+  0%   { box-shadow: inset 0 0 40px 20px rgba(200,0,0,0.0); opacity:0; }
+  10%  { box-shadow: inset 0 0 80px 40px rgba(255,30,30,0.9); opacity:1; }
+  100% { box-shadow: inset 0 0 40px 20px rgba(200,0,0,0.3); opacity:0.6; }
+}
+
+/* 중앙 물음표 / 긴장감 텍스트 */
+#drumrollText {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  opacity: 0;
+}
+#drumrollQmark {
+  font-size: 100px; line-height: 1;
+  filter: drop-shadow(0 0 20px rgba(255,50,50,0.8));
+}
+@keyframes qmarkPulse {
+  0%,100% { transform: scale(1);   filter: drop-shadow(0 0 10px rgba(255,50,50,0.5)); }
+  50%     { transform: scale(1.12); filter: drop-shadow(0 0 30px rgba(255,80,80,1)); }
+}
+#drumrollLabel {
+  font-family: 'Pretendard','Noto Sans KR',sans-serif;
+  font-size: 22px; font-weight: 900; letter-spacing: 6px;
+  color: #ff8080;
+  text-shadow: 0 0 16px rgba(255,50,50,0.8);
+  margin-top: 8px;
+  opacity: 0;
+}
+
+/* 두구 플래시 */
+#drumrollFlash {
+  position: absolute; inset: 0; border-radius: 10px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,50,50,0.6) 0%, transparent 70%);
+  opacity: 0; pointer-events: none;
+}
+@keyframes drumFlash {
+  0%   { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* 두구두구 진행 바 */
+#drumrollBar {
+  position: absolute; bottom: 20px; left: 10%; right: 10%;
+  height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden; opacity: 0;
+}
+#drumrollBarFill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #ff2222, #ff8888, #ffffff);
+  box-shadow: 0 0 8px rgba(255,50,50,0.8);
+  transition: width 0.1s linear;
+  border-radius: 2px;
+}
+
+/* 우승자 공개 폭발 */
+@keyframes revealPop {
+  0%   { transform: translate(-50%,-50%) scale(0) rotate(-15deg); opacity:0; filter: brightness(4); }
+  50%  { transform: translate(-50%,-50%) scale(1.1) rotate(3deg);  opacity:1; filter: brightness(2); }
+  70%  { transform: translate(-50%,-50%) scale(0.96) rotate(-1deg); filter: brightness(1.3); }
+  100% { transform: translate(-50%,-50%) scale(1) rotate(0deg);   opacity:1; filter: brightness(1); }
+}
+
 #celebOverlay {
   display: none; position: absolute; inset: 0;
   pointer-events: none; z-index: 9999; overflow: visible; border-radius: 10px;
@@ -969,6 +1057,17 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
     </div><!-- /csShakeWrap -->
     <div class="cs-fadeout" id="csFadeout"></div>
   </div>
+  <!-- 두구두구 빌드업 오버레이 -->
+  <div id="drumrollOverlay">
+    <div id="drumrollBg"></div>
+    <div id="drumrollVignette"></div>
+    <div id="drumrollFlash"></div>
+    <div id="drumrollText">
+      <div id="drumrollQmark">🏆</div>
+      <div id="drumrollLabel">우 승 자 는 . . .</div>
+    </div>
+    <div id="drumrollBar"><div id="drumrollBarFill"></div></div>
+  </div>
   <div id="celebOverlay">
     <div class="celeb-box">
       <img class="celeb-char" id="celebChar" src="" alt="">
@@ -1568,7 +1667,7 @@ function applyFinishEffects(winnerName) {
     fill1.classList.add("finish-glow");
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        animateGaugeFill(fill1, 3000);
+        animateGaugeFill(fill1, 3400);
       });
     });
   }
@@ -1578,7 +1677,7 @@ function applyFinishEffects(winnerName) {
     firstRunner.style.left = "0%";
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        animateRunnerToEnd(firstRunner, 3000);
+        animateRunnerToEnd(firstRunner, 3400);
       });
     });
   }
@@ -1608,6 +1707,90 @@ function clearFinishEffects() {
   document.querySelectorAll(".runner-icon").forEach(el => el.classList.remove("frozen"));
 }
 
+function playDrumroll(onReveal) {
+  const overlay  = document.getElementById("drumrollOverlay");
+  const bg       = document.getElementById("drumrollBg");
+  const vignette = document.getElementById("drumrollVignette");
+  const flash    = document.getElementById("drumrollFlash");
+  const text     = document.getElementById("drumrollText");
+  const qmark    = document.getElementById("drumrollQmark");
+  const label    = document.getElementById("drumrollLabel");
+  const barFill  = document.getElementById("drumrollBarFill");
+  const bar      = document.getElementById("drumrollBar");
+
+  overlay.classList.add("active");
+
+  // 배경 어둠
+  setTimeout(() => { bg.style.opacity = "0.75"; }, 30);
+
+  // 트로피 + 라벨 등장
+  setTimeout(() => {
+    text.style.opacity = "1";
+    text.style.transition = "opacity 0.3s ease";
+    qmark.style.animation = "qmarkPulse 0.8s ease-in-out infinite";
+    label.style.transition = "opacity 0.4s ease 0.2s";
+    label.style.opacity = "1";
+    bar.style.transition = "opacity 0.3s ease";
+    bar.style.opacity = "1";
+  }, 400);
+
+  // 두구두구 — 박자마다 flash + vignette 펄스
+  // 점점 빨라지는 간격: 600→500→420→360→300→240→180→120ms
+  const beats = [600, 500, 420, 360, 300, 240, 180, 120, 90, 70, 55, 45];
+  let elapsed = 500; // 시작 딜레이
+  const totalDuration = beats.reduce((a, b) => a + b, 0);
+  let accumulated = 0;
+
+  beats.forEach((interval, i) => {
+    setTimeout(() => {
+      // 플래시
+      flash.style.animation = "none";
+      void flash.offsetWidth;
+      flash.style.animation = `drumFlash ${Math.max(interval * 0.8, 60)}ms ease-out forwards`;
+
+      // 비네트 펄스
+      vignette.style.animation = "none";
+      void vignette.offsetWidth;
+      vignette.style.animation = `vignetteThump ${Math.max(interval * 0.9, 80)}ms ease-out forwards`;
+
+      // 진행 바
+      accumulated += interval;
+      barFill.style.width = (accumulated / totalDuration * 100) + "%";
+
+      // 트로피 점점 흔들기
+      qmark.style.transform = `scale(${1 + i * 0.015})`;
+
+      // 마지막 몇 박은 화면도 살짝 흔들기
+      if (i >= beats.length - 4) {
+        const panel = document.getElementById("panel");
+        const amt = (i - beats.length + 5) * 3;
+        panel.style.transform = `translate(${(Math.random()-0.5)*amt}px, ${(Math.random()-0.5)*amt}px)`;
+        setTimeout(() => { panel.style.transform = ""; }, interval * 0.5);
+      }
+    }, elapsed);
+    elapsed += interval;
+  });
+
+  // 클라이맥스 — 전체 화면 흰빛 폭발 후 공개
+  setTimeout(() => {
+    // 최종 플래시
+    bg.style.background = "#fff";
+    bg.style.opacity = "1";
+    setTimeout(() => {
+      overlay.classList.remove("active");
+      bg.style.background = "#000";
+      bg.style.opacity = "0";
+      text.style.opacity = "0";
+      bar.style.opacity = "0";
+      barFill.style.width = "0%";
+      qmark.style.transform = "";
+      qmark.style.animation = "";
+      label.style.opacity = "0";
+      if (onReveal) onReveal();
+    }, 120);
+  }, elapsed);
+}
+
 function triggerFinish() {
   if (celebActive) {
     celebActive = false;
@@ -1626,25 +1809,29 @@ function triggerFinish() {
   finishApplied = false;
   document.getElementById("finishBtn").classList.add("active");
   document.getElementById("finishBtn").textContent = "⏹ 종료";
-  document.getElementById("celebWinner").textContent = currentFirstName || "";
 
-  startCelebAnim(currentFirstName);
-
-  document.getElementById("celebOverlay").classList.add("active");
-
-  spawnFlyingChars();
+  // 달리기 애니메이션을 두구두구와 동시에 시작 (duration = 두구두구 총 시간 ~3.5s)
   applyFinishEffects(currentFirstName);
-  spawnBurst();
-  window._celebInterval = setInterval(() => { if (celebActive) spawnBurst(); }, 600);
-  celebTimer = setTimeout(() => {
-    celebActive = false;
-    clearInterval(window._celebInterval);
-    stopCelebAnim();
-    document.getElementById("celebOverlay").classList.remove("active");
-    document.getElementById("finishBtn").classList.remove("active");
-    document.getElementById("finishBtn").textContent = "🏆 완주!";
-    document.querySelectorAll(".particle").forEach(p => p.remove());
-  }, 15000);
+
+  // 두구두구 빌드업 후 우승자 공개
+  playDrumroll(() => {
+    if (!celebActive) return;
+    document.getElementById("celebWinner").textContent = currentFirstName || "";
+    startCelebAnim(currentFirstName);
+    document.getElementById("celebOverlay").classList.add("active");
+    spawnFlyingChars();
+    spawnBurst();
+    window._celebInterval = setInterval(() => { if (celebActive) spawnBurst(); }, 600);
+    celebTimer = setTimeout(() => {
+      celebActive = false;
+      clearInterval(window._celebInterval);
+      stopCelebAnim();
+      document.getElementById("celebOverlay").classList.remove("active");
+      document.getElementById("finishBtn").classList.remove("active");
+      document.getElementById("finishBtn").textContent = "🏆 완주!";
+      document.querySelectorAll(".particle").forEach(p => p.remove());
+    }, 15000);
+  });
 }
 
 function spawnFlyingChars() {
@@ -1836,6 +2023,8 @@ setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
+
+
 
 
 
