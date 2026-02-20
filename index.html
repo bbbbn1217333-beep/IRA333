@@ -2211,11 +2211,12 @@ function applyFinishEffects(winnerName) {
       winnerAvatar.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
       startAvatarAnim(winnerAvatar, winnerName, 1, 0, true);
     }
-    // 2~7등 아바타 & runner: 반투명 + 흑백 명시 고정
+    // 2~7등 아바타: 1등처럼 선명하게 표시
     document.querySelectorAll(".avatar-img.frozen").forEach(el => {
-      el.style.opacity = "0.35";
-      el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6)) grayscale(0.8)";
+      el.style.opacity = "1";
+      el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
     });
+    // 달리기 아바타(runner)는 그대로 반투명 유지
     document.querySelectorAll(".runner-icon.frozen img").forEach(el => {
       el.style.opacity = "0.3";
       el.style.filter = "drop-shadow(0 2px 4px rgba(0,0,0,0.8)) grayscale(0.8)";
