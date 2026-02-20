@@ -108,12 +108,13 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .score-total { font-size: 18px; font-weight: 900; color: #fff; text-shadow: 0 0 6px rgba(255,50,50,0.4); flex-shrink: 0; }
 .score-label { font-size: 13px; color: #c82a2a; margin-left: 1px; font-weight: 700; }
 .round-scores { display: flex; gap: 3px; margin-left: auto; flex-shrink: 0; }
-.rs-badge { background: rgba(0,0,0,0.4); border: 1px solid #5a2020; border-radius: 4px; padding: 1px 7px; text-align: center; min-width: 46px; }
+.rs-badge { background: rgba(0,0,0,0.4); border: 1px solid #5a2020; border-radius: 4px; padding: 1px 5px; text-align: center; min-width: 40px; }
 .rs-badge .rs-r { font-size: 11px; color: #c82a2a; font-weight: 700; display: block; }
 .rs-badge .rs-v { font-size: 18px; color: #ffb3b3; font-weight: 900; display: block; }
 
 /* ── 3라운드 뱃지 임팩트 이펙트 (GPU 가속) ── */
-.rs-badge.rs-r3 {
+.rs-badge.rs-r3,
+.rs-badge.rs-r5 {
   position: relative;
   will-change: transform, opacity;
   overflow: hidden;
@@ -131,7 +132,8 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 
 /* 배경/테두리 변화는 ::after 레이어에서 따로 처리 */
-.rs-badge.rs-r3::after {
+.rs-badge.rs-r3::after,
+.rs-badge.rs-r5::after {
   content: '';
   position: absolute; inset: -2px;
   border-radius: inherit;
@@ -140,7 +142,8 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   opacity: 0;
   transition: opacity 0.1s;
 }
-.rs-badge.rs-r3.r3-impact::after {
+.rs-badge.rs-r3.r3-impact::after,
+.rs-badge.rs-r5.r3-impact::after {
   opacity: 1;
   background: rgba(255,60,60,0.7);
   animation: r3FlashLayer 0.75s ease forwards;
@@ -153,7 +156,8 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 
 /* 스윕 라인 - ::before로 분리 유지 */
-.rs-badge.rs-r3.r3-impact::before {
+.rs-badge.rs-r3.r3-impact::before,
+.rs-badge.rs-r5.r3-impact::before {
   content: '';
   position: absolute; left: -10%; right: -10%; top: -2px;
   height: 110%;
@@ -181,25 +185,31 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   100% { transform: scale(1) translateZ(0); opacity: 1; }
 }
 
-.rs-badge.rs-r3.r3-impact {
+.rs-badge.rs-r3.r3-impact,
+.rs-badge.rs-r5.r3-impact {
   animation: r3FlyIn 0.48s cubic-bezier(0.22,1,0.36,1) forwards;
   border-color: #ff6060;
   transition: border-color 0.6s ease;
 }
-.rs-badge.rs-r3.r3-impact .rs-r { animation: r3TextPop 0.35s 0.15s cubic-bezier(0.34,1.5,0.64,1) both; }
-.rs-badge.rs-r3.r3-impact .rs-v { animation: r3TextPop 0.38s 0.22s cubic-bezier(0.34,1.5,0.64,1) both; }
+.rs-badge.rs-r3.r3-impact .rs-r,
+.rs-badge.rs-r5.r3-impact .rs-r { animation: r3TextPop 0.35s 0.15s cubic-bezier(0.34,1.5,0.64,1) both; }
+.rs-badge.rs-r3.r3-impact .rs-v,
+.rs-badge.rs-r5.r3-impact .rs-v { animation: r3TextPop 0.38s 0.22s cubic-bezier(0.34,1.5,0.64,1) both; }
 
 @keyframes r3Sizzle {
   0%,100% { box-shadow: 0 0 7px 2px rgba(255,25,25,0.45), inset 0 0 8px rgba(255,20,20,0.12); }
   40%     { box-shadow: 0 0 11px 3px rgba(255,50,50,0.65), inset 0 0 12px rgba(255,40,40,0.2); }
 }
-.rs-badge.rs-r3.r3-done {
+.rs-badge.rs-r3.r3-done,
+.rs-badge.rs-r5.r3-done {
   border-color: #ff1f1f;
   background: rgba(45,0,0,0.5);
   animation: r3Sizzle 2.2s ease-in-out infinite;
 }
-.rs-badge.rs-r3.r3-done .rs-r { color: #ff5050; }
-.rs-badge.rs-r3.r3-done .rs-v { color: #ffd5d5; text-shadow: 0 0 7px rgba(255,70,70,0.65); }
+.rs-badge.rs-r3.r3-done .rs-r,
+.rs-badge.rs-r5.r3-done .rs-r { color: #ff5050; }
+.rs-badge.rs-r3.r3-done .rs-v,
+.rs-badge.rs-r5.r3-done .rs-v { color: #ffd5d5; text-shadow: 0 0 7px rgba(255,70,70,0.65); }
 
 @keyframes r3BadgeHeaderIn {
   0%   { transform: scaleX(0) translateZ(0); opacity: 0; }
@@ -208,16 +218,16 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   90%  { transform: scaleX(1.01) translateZ(0); }
   100% { transform: scaleX(1) translateZ(0); opacity: 1; }
 }
-#r3badge.r3-header-in {
+#r5badge.r3-header-in {
   animation: r3BadgeHeaderIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
   border-color: #ff6060;
   will-change: transform, opacity;
 }
-#r3badge.r3-header-done {
+#r5badge.r3-header-done {
   border-color: #ff1f1f !important;
   animation: r3Sizzle 2.5s ease-in-out infinite !important;
 }
-#r3badge.r3-header-done .r-label { color: #ff5050; text-shadow: 0 0 8px rgba(255,50,50,0.6); }
+#r5badge.r3-header-done .r-label { color: #ff5050; text-shadow: 0 0 8px rgba(255,50,50,0.6); }
 .track-wrap { position: relative; height: 18px; overflow: visible; }
 .track-bg {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -260,7 +270,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 .runner-icon img {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scaleX(-1);
-  width: 180px; height: 180px; object-fit: contain;
+  width: 150px; height: 180px; object-fit: contain;
   image-rendering: auto;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
@@ -471,6 +481,12 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.8); } }
 .live-text { font-size: 11px; color: #ff4040; font-weight: 900; letter-spacing: 2px; }
 .empty { padding: 14px; text-align: center; color: #6b0000; font-size: 12px; }
+#bgCrackCanvas {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; border-radius: 10px;
+  opacity: 0; transition: opacity 1.2s ease;
+}
+#bgCrackCanvas.visible { opacity: 1; }
 
 /* ==============================
    히든 라운드 컷씬 스타일
@@ -1084,6 +1100,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 <div class="scale-wrapper">
 <div class="panel-wrap">
 <div class="panel" id="panel">
+  <canvas id="bgCrackCanvas"></canvas>
   <div id="hiddenCutscene">
   <div id="csShakeWrap" style="position:absolute;inset:0;pointer-events:none;">
     <div class="cs-alert-left"  id="csAlertL"></div>
@@ -1188,7 +1205,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <div class="header">
     <div class="header-btns">
       <button class="finish-btn" id="finishBtn" onclick="triggerFinish()">🏆 완주!</button>
-      <button class="lock-btn"   id="lockBtn"   onclick="toggleRound3()">🔒</button>
+      <button class="lock-btn"   id="lockBtn"   onclick="toggleRound5()">🔒</button>
     </div>
     <div class="header-center">
       <span class="header-glove">🤜🏻</span>
@@ -1200,7 +1217,9 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <div class="round-summary" id="roundSummary" style="display:none">
     <div class="round-badge"><div class="r-label">👑1라운드</div><div class="r-winner" id="r1winner">-</div></div>
     <div class="round-badge"><div class="r-label">👑2라운드</div><div class="r-winner" id="r2winner">-</div></div>
-    <div class="round-badge" id="r3badge" style="display:none"><div class="r-label">👑3라운드</div><div class="r-winner" id="r3winner">-</div></div>
+    <div class="round-badge"><div class="r-label">👑3라운드</div><div class="r-winner" id="r3winner">-</div></div>
+    <div class="round-badge"><div class="r-label">👑4라운드</div><div class="r-winner" id="r4winner">-</div></div>
+    <div class="round-badge" id="r5badge" style="display:none"><div class="r-label">👑5라운드</div><div class="r-winner" id="r5winner">-</div></div>
   </div>
   <div class="race-section" id="raceSection">
     <div class="empty">📡 데이터 로딩 중...</div>
@@ -1215,11 +1234,11 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 
 <script>
 const STREAMERS = {
-  "이라333": { look: "CGKHHKEDKCJHIGEBGFEEHJPANLIFOMALOPBJCCEBFPOKJHOBBAENJFKGANOOCCBCDFCPFLDEBPFEFDMHGOOELJKIFKDHGKOMPAKOAOPIPECGPLHMGJDCDDCBGMNHFLLPEKBBMDHINJJOMPOBEONFPAFIJOOCDJMKNEIKIBBGDHENPAHPBNODJFCHIDKBEOKHAAMBDDCAFCMEANHPLHOMLNHMJBMFAOAPIDNGNAOBAEFHGCHFABCEFMMEBLHGJBJMDHCOJJAOCBOBIODBNBMOGBKIIMKLGGEAMFAHPFOOFGCLKBEBFFHPNBOMIMMOGMEPGEHMOPEDENKCEBHFGDJMPPCFEOBLHLHGPDMEBOLFCADNBPEAGAPFPJKEEEGNLNNNHILEIDFCFDHOFOHDIFLJIGFCCDGHPCEKDOLEBCLGFCKIEIOOGGHHPEINEFJKFNKBBJFIPAFPBCIEGAGJEEOAFBPJDBPPBNMHOAFIKMEGKMIDKNLCNCNCAEHIONAGBFBGEBDCBPKLDJJAOIBPKFCBLANGMDPEODFGDADAFCKFMLFJGIMCHNHLPEPDLHIADGGJIPHDJHEODMKGJLCHIBEJGPNMMCLJPKBOJBOPPABHCNIGOIPLHFMDOKMIGPEOMJIKAFHIOHNOMCKOAIKGEOAHJCBMMDMPDDJGBIPDEFPEJJIJKICNADBECMCFEGKLJEMOBCCDMMKDIMJDCIHHFNMPIHMMHLANNCDNGOIAPPNNBDIKOMHJOMHCCHEJPKIHHFNDHNMPEGGBMBMJENPKEMAPCCNKOKKJAOAAMIACLIGKFOLIBPNKKJCFDCMJFBCFFOCHJNMMPCLNHGLDGBCDBKOECPCDHOLBFAKKIDJMPNDCFAHHKFLIGLNOKODILHIAMCNEGFLKCDFFHCKGFIHMNDGMFJOHNAGFHCJLJDJDCKCAKMCKMIJFNNPJGMNGHJPKKLGCKJBBOECIJBCEJICCBKEGJNBBGLENDOLGOCBBCKNEEAKEAFIIHBLJLJOEGHJHHHLA", wmotion: "W03" },
+  "류아": { look: "GCAKKIDAKGCELMBBLPHPIJEMCPKHLEIIJJHIGNLEDHIOFICJBKHNEAPMFNBFKHAEPPNFGKIAAPEJGICCNAIKBJEJHNBCEHJOCENPEBBKEAJFBPNPFKFFHHLNNKPFIHPNPGMDFLAEGHHFMHPJAGGKFOJJBGKCKOIMKGHNDONCDEEDDIBGCHMOEENMOOMCCOKDIPAOJJEACIBAIEILPICAEMFDFCEEIIDMMCDLIEMBNLLDNMPKHMOGOOPCBDOIFGHMBCHHNCILEIKNDIAGMDACAECIHCAEDFDFOHBMKKKKKGJCBIMPLFBHEICKPILFHNOKNLCEPANAKGKIGFHLLMJMJLNPAJBFEHMGAGEFBAFPKNLHNCAPNIAAPKEKGKAAKKKKDMOPLEAFGKALFEBBEJFEDBCDIAMDOLNEEFEAEEHEOOAKDHBOIANMCGBMNGIPMGLAHFMEMDGHGDFCLOIEIHEJEBJECMPIHCJBJENKALALLLNBNHEGDMMJDFHLEBBMGILNOGAOCPKOPIBFBKPEDLIOBGAOMPJNKBAAGFJPCNEFHDECAKIOOAKCKFMEAEIMGBANFDBIOEMAADANLJEMGGGCBMDBHKNCPABNBHCMNLDPBDJCIDDOFLIFHMBLPKHGIHJJFNMBLLJBPOMJMOBGHGDJECAIGLHDPAIBMLIPOMCODDEDGJIGAGDPMKGHGDOICJADDKLANMJEHGHGFNGJMNEGDBGPLDENFNIJAAGAEEFKANCDDHDBINLDOAMPNFAEFCPKDFMMPIAKKPFOBICPEJHOKCAOLDFCIFAJEPDDNBCFGJOPPELCNLENIDLCNLIEJGGHADPJNOLPINKGDOHBHGJOGOPAFGLBPDIBMENHKKJNPKCAOFNNENNFLLCINJICDBMMCDILJPLDNJGJNJKJDFOKJLKAMMDAELGNIIIBCMDODHGPAPHLHDANJFEKKMGHJKGKIIFNBGBHGLMLEIAEJLLEJCAIPKMEEJIBKFNEDCECKCJLDIPJKIDCIFPKKBKDCAJN", wmotion: "W00" },
   "나로후닝": { look: "CGOCOFDLOJNBCNAIPPBHEPCGALELJHGACIMKCKDLIGHFGFNENDPLCDDCPLEKBEGLBMDLDGHMNLDPJDLECPBONDCCLGJGPKNHAKKBDGEOGBOIBDAICCIPLCJOCGBPHBHNKPIMILBFDLIEMLHDMPPPILOOCDCHCNCJDMGOKFHDBPNFGHJDPFPGKADIGPPHCAHBKBAGGAKLHHLOGPOBCKGDFLAAPEBOMFLPGGELFKAIGKNJACHNMMLBNJHIEKNGLFIBFFEDCPCMIAAELJNEBIEKODBGEOGJEFFDMLFHKADGFOJIHNNEFPDALBPHAOLGFKHPMODLDACFHENGJEGHLMMLCNJJNJBPAEFGEBIABFIDGJAGPMJENPNOAEMKGEDFDONHAABJAALJMPINMECMLNDDAOFJPIGEPAJEMIEFGNPOAILJLLEBKOBOMBGGKHFCMFHJCPHFLKPEKOEJNFIOLPFBKEFMBDBIGJEBIGMBAGPCNPAOJHHMCKEMMFILJEPFJLLGMHGFAIGGCKKPHGINIDEKPCDECCHHIHIMCIEHHPOHJMJOCDLDOKFHILBAIBAELMAAJAHKCIKGNHKNEGHCGMEGOBAOBDEJOJFONEGCMAABIDHGLMGIKMPAODHKANJOEGHINDAJOMENCPAJMIMLGGFKEFMDGEEAODPLCMFMPOIDJGEFFCHONADDDMBJKEGLELHPFDAGJKDFHLBBABENBKJICGNGEJDOJELAGPJENJLJPCGJPCGNANLFIMPOGKOGNONKBGDEODHLNAPMPPGJKDDAOMNPHMNPCCNGOANPFECKLAHFPKGBIMBMDEDNCJJMIMIKCPCCGNGGIKCBALPBFNPGAFDIGIGCJCGNHGLKLGOHLMCOMLHCFIBIEDDNBFHGDFMKKGDEEOBDGJNJNMBHELAGNKJHFPGFGPJDPCMOLCFLKHMIDAANJIELNLGBLODBEDNAAHCNEDDLOHEOBIAGHPCMNGJAOHHNCDKLPDKJFEJONPJDPMKEJNPGLBHAMJFHINCN", wmotion: "W00" },
   "진캐":   { look: "OBPKOKNMNPEOKNGEKAJJICKGNJCDKEIOIGEFLLDBLCLPOEHGPBKOJPBDBLOPKMLNAPJKHMLPIMONOKEHDEKFNPCIMJPPIFLFMLGIBIIFPBIMFEMPMPJHMLPKPJGMFPEKBNMHEMKCFCANHNPBGKKMDFJNDPOGPHHHJJBIMLHDHANKHBDFFDADAJJCBKIIPMOJMEBBLKIBIHDHMFLBCJEKLCDMFOGMILOPBKAONMPNEBAFIHJCNHFDIKFBJJKOMNBFLHFHIHNPNIIMKGKENEKEOAKAHIBJFMFPLKJGHFJIJIMKIEIHLGGKGBOFAAIPDHNKOKDGEBEACNBPADCMNAFHHDJEDGGEHMCMDHJKNKHMJMPGANIDIHIFNIAGJKKEJJNMAJCMINPCDGOCPLIFAKOKCGAMHCCLHJPFPNMFJLLNJDJIFDLBJJEKNMDCDHOJDKOINMKEIILMGKNADFLLFHADABFHFKCNCAIBHLFKNKJEFGMDIHKBBFBJJFHDJDHGAMOBBEICDCGHIGLNFHOKFDGPMNIDLDCDKPPLEAMGMLBBMKDLMJDOPEFJLOLLEOJGBPFEJCNGAGNOKDNEKPEBCOGMEFAHCMFHMNPCLJGNIFFBCBHJBLNJOOIKCHEPECGLLGPHNBGLEFMLEECFICIMJODJGHGKIAPILACNBPLNDLACBLDFALEDLIEMBMCKIOKPCEGEGLIAFKFLIALBJDKDGPNMDHONAHABHECJOBJAPMONFDAOKHJPAIJCAKPOMNDLAGOEKBNJNHAMCGCOCDADIEKIKNLBLFOIACIELKEDBACDDIKNNNBPEAJJBDPPBAGMCLELFPDHAEDEGOBOIJIMIBCDMFKJDFCCHDEGGCAGNBKPCHBMEKPEDAGDJCIFBFMJAPIEDLOEHJPKBNHFGCBAJNNBGBJINHOLKEGGGJIHBJBIGCKDEFEICAAAIMDCAPGMJHJBLMBJAGGBJPALOOLCKPHLIGIKMFLLCMELDFELBNKPDFIMFCGLCBMAHAOGFAJBDEGD", wmotion: "W00" },
   "팡이요": { look: "AHFMCHNACDDFCMOMICDHNKFEAFKOCLPFDIIJJPDFNPDDBFHEHCBPOAMFAENNFGBMFJELMPIOHCBGKMEIJPIFLAPGHBGMHJAJAGEDGPAKMCLAKNEJCMEPCEJKFHMJJONPGKJBDADGBJBACDBCFCGLFNJNPDADNDCBMAECGKMFNNFGOEFOFONOJEBIFELNBJIFKDHGBPPKMFANLONIHEGMIGMAJCLGKAOBLJDAFEDEAMHDGCFDDLJOEIOKDPNFEPPMOJGHOLDOCNLAHMJBFPKOLIDJPELGLFEBFLAGPIIIFPJCJLDJMIGJLJGHKHJKPAOPGEMOFKNGECGNJKBDANGJOHCOBDJLNOLALAIENFNCLFEPJOAKLBIFBEFGMKEJMAPIJKKCOKJAFBBPKBNHBEAOAPHMHBCOFLGFFMMPHFLPDFGALCOJHAAHCJPLPGGINFAOFPPIAMCHCMDKIMLEMJGMJNLMOMPPPMKAAJPLGABOLEHKCKJMIDHFMIGPGDPFPDJLONKCFGGELEFGIBPIEOFJLMLMJBIBPJECDFIEDGLCPEPOEJKMMOEOEGJJEIOBEDKFIDEEJOMIAKFMGIHNEHNFMFOKLLNPLIGKPJBAPLKDFGKKJFLMBNGKOOLGMJCAKDEOOPLKGDJLEIOELADEFKGLJLIJDGOMAGALCOGJMGLFGGPJHLBKJONFAMOCMHJODGLNIBJPAPMFNMNHNCJJFFIJKJMGIDGODGIGEHGKBFBACGFPGHEJFPKFCIMCIOEDBBIDJKDMEDIOAKJMHEDHOOGMPGBINJMEMGCNAPOJFMECFAEIDLMMHLPKOJLMCBHOBIHMACELJCGAEIGHLCGIJCHGFPJIJDAODNJBOHECFPCCILKBBOGLPEMOJMJLFNNPEAANMGKCJPOGBCBHDOOAJJAPGIKCDCEKHAAFMBPIBJBJNEPGHENKOBMCABFAHAELNGPNNGPIPLKAOKLGFDDKAFHKBGABIAOOHIFLGANNAHPEDBKNOLLJHOGOIHBKEEPFBJBH", wmotion: "W02" },
-  "일어나": { look: "OFOCBAJFNGHKJNNMMAMJNJOPADPCKMFGKJAOHJACIFBCFJCIBGJMPLCLAOLPFHOBOFALAAMPFPMILMCNBJPDFFJIACOIGKKIAEHJMMCJOHHEJJOBKHBKKJBLFEBOLCDDADFMPDHDODACALIMCEFKOMCMCIMKLOIENKKNHJEPNHHIEEHCOICJGOMPOOAHEOLILMAJNPEGADMJPMCGFKJJFDHNNFMLFOIAEBAMJMKNGMADILLGEOKJBOLCBBOOAGHOACHJPKIPKOKCJPBCGPCJMJMAPJLFALHHIDIOFMNAKCKLAIPBPDFOJCGJMKDICCEPMPFJMBCDMJGGAPCAPEPAKELGFAIGFKLGJLBMEHNKEOPEMAGHCDLPMMIPIPFJMNJHLEDBFNOCLIABLLMGOGHNFDMOKAFONBOEPMLPLNABJOHMJHLJEBICFGLDFJFINJIOEILNDILOAJDCPLOCDNINIECADENGBCDCAFLBHNFONDMGHILKKNMHNKIJGAKDEMBPHMDKKPPCHGNOLCHEGMCDJKDJAAFEHEKLBPONDAECKOODNPOMCBKEDJBALGFDBGAEDDOBIGDDPDHANJMBEMCCOHDDBCIKBDEKONBFGAJPBBDAMHMDBMBABGNGOCLMELLNGIOFHNLCNFGFEOMBBLOLEALMIFIIEPHJFLJHKFMNOPPDGBAKEIGMNLDPKJKOHBDFMHHFEEIPIPHOGDJIOPEIKKOJOGKAKCNHKNHMHJMEJFKLIKKICOLDMPHDHMDOBCJCLMLMKMHAFKGAALKAENODBPPKDIKFBBBCCPGJLGCOHOGJDLHMDHDBCAGPJEEOHICOAKDOHCDEMEJJGGDGDBKMNIIGGLDPMLHJAIKAOIBELOLDDJBIEGDPMADPCIFGBGDCNAPNBHOPGNBNDPAJEMFECIDNCOPEFFCMFIIEFDHHAIIFBEIINPIOEJCLPNDGGPJBDNIOOKILGLAOOGJKIFNDOKJPCAHDFBKGADNPHNFDOIGOPGPGNBMLBAIBENANGPEL", wmotion: "W01" },
+  "부추": { look: "HIELKPNAHDFOIKMCPEMDKPICEKFBEEBBEEMJAFKOECDMEOKBLGCHBLDBOBDPLHKEOGMJEPCCBGFGFKNHELHGOPOCGJLEINKNKHELKGBJAIBNOLHIOLIPCNEDECJLFLKCLEADOBMAPMOLPJHLOBHOMIGHPHGENJGLDAMBCBIKPBPIBFGJIDLAKKDANLFJKGGMAHCJLFAAKHDINBOABGJFODMCMGCJEJPNCJINADOBDAEBAOGBLCCNHIDNEHNOMKOOPEOIFMFJAKGBNPEKFHIEEBDHDAPNOAKIDNAKEMMBBCBGHJPPKGBCCIAHIEAIKALNMNNGLKCNPCEFHGFGLIAKLMKJECPHAKOHKKPGAKGDBOKDAEHKFMCJCEMJICJIALFOPDJIHOEPCAKNCJBKAOPPLCPECFNOCNKLCHIOLKCAGKEMCNPGJHJCFEONNEIKIAJBJJCPHIDKFIJGHIIKDAOAFGAAKDHLIJKLLDJJAOGMKNGIKDKHIJLGCDGNFNPDGOIIKAADFFILNJNPALGKBJCDMEMPGCILGDMBNLLHPDKNEOOBJPMDAIPIPNDGFNMJONJCAEOEMKLEECKGBCAMKHGNIGCHJOLPFEBJFKIHGKEOPBKIMLOGLBCEOMEAOOJCFODKFABHOMGDNFMICFGJFNGMHOCLCACLNMKHHCDMLNMJBBBKHLOCOMGOCENEKGOEIGKHNDFHEMOOICLLDDJHJEKEKNENLOEAPGMAKKLHANHPNBDGIKDONFJGDOBPBKNJFDKINBIJCBEKBBHKCOHKGMFNKOHHMCBIDFMEGJMKBIJPJKOJNJGGCEDKGGOMJGMIBGKNKPLKDPGMIGPAJKICJMCFPBIMCENCBGNBAKADMGGNGLAAAMIGJKJAOJINJOHGDMOMIPKHPNLKHCHAHJDLILOHDILDNPBFBIJIKPADFAGLFBIPBKOAMBJNMHKFLDNDFCCGPNGAHFAAGDHAIBPLJELPOBOMOFBBLIKDKIDKFGDEGGDANDNALBKPDINDKMPHPHLE", wmotion: "W02" },
   "세글자": { look: "EFBAJENHLMCBEJPKBNNIDKACLKGBJOFLJOJLBEPIHEKBFCBMCDIGGBICHCFMOMBGMMAKBFOOFLKJBBAIEIPHJPDDOIGBBJCHAMJGGFJPIBNEAIOFMKPAAMOJOPPDBEPCMNLHCKDGMECBMJBNCAKLIOKJNCKFELGCIPPAAHAFCMEPAGKDIABINABNAIGICLGMMBIOPLGJGLEEDDKFIHFCBGHMMDGKODGDKLALENFFLNCAMABKFDPBFEJGDPOMLCCIMPIFDDEGNMAGHEKPMMCOLHKJGAONDBCMKJCOFNDJCDENPBJALLPBFFKOCPLFIBBLBMMNJONLLPJEMFCAKCIIBENOEJBGABFKPIEJEKCKICHJKFAHGPOBCGCGKOJCPHJLEKEFDIPHNKLKNMJAEEMDCMCNHOHHEIMBIPPJEPDPFLKIPDOACDECILLGBFOMAALCOGONJOAGMEAKEAPOBPAAKCFGHGEIDFNGKFPNKAIDFPJHEHJEOPIGLNBPCKOMHABKFOHBDEACJMPLPBOIDCKDPEGGOBBKEHGOIOLGGMLLNICNFLNOKEFNNFPMNFMDEHDFFDNGBNDNPGBLDPBADPKECHKFHAONAJJPIAKCHLFPHMNJBEPLJCHPBEEAFLKLJINELFHAAACGPMEACAJFOIONHHEPCBNLBLDGJGEJILNLDAJAFENJDOLOCPHDIELIBJEHHCGMDFJBLIGFMGDHHKGPEABNIPGJEEDKFHJFPJAJABAHNFIMHJCKKCCPGIABHHANLNAKOOBKFCKKBIKILDBFDEDGOJEKEGFKFFOMJLICFPMAEIGKBEPIPEFLMGOBGOJOIPGMLKCGHLNBDECMDPAPJJMCKEOKPAHIGHIFNKKAECADIMHCIGKIICPKIKLLFDJODACDHHKPKGFECPBOFFPAPMHODNPDHIEMABLCNOBNHEPOGANNHHGGGKPJOFLLCDKNBFCDKOBDCNOOMBOECGKJFDGIIIPJEACCNMMGGOFOHLDCFMKNGOFCACABGBOGDDFJ", wmotion: "W00" },
   "식중땐": { look: "HOGJJHPOPPDFAOEBJJODANKNBLPKGLKHHMGNLFKLLGDPIKCJOEDDMPCPALIBLIEADMBILKEICPOCONOMFIBHBBFCAPOMLNBKKFEDDLLKGNJCABJIGKIKCEKLDJFKGFDONAFNACKCFDNDGGKNHEGBKGMKNAJOFADOJGFGHPMIALNGKNGOCMAHFGPPIELPPGODMLAPOBAKDMHENNNHDIFEIHJLHEIPJDNKBAJLKBBIJGGKMOAMKHKLMPPDKAOHDGBGCFHGIONELNHDNKINEOGOLIJIJLPMPCPABBNHIAENJFCGLHLMJINIMIMHFPLNLMKDFPDDIGMHNBBDDOAIDHNGHEGFAOADKKGGDNPBGDMMOKAPCKILDLMDCAOMMMJCFBLMNGHELOMLMLNMADAJDFHLIOBOIIHEOHLBICNPMDBKCLDOHEKNNOOFIJKMFBFECCGLINADNCMHMCGAEPFGNIOFDFHEHGHCNIOACHNGGJJILCEOPAAHHELODDBFEFMJADMEDAIKPOOCIHJFLHOPBLIHIIJBOKKAGOFIAGMDOKEBFOHIAPHDMFDNAEFBFILDOFPOBIKBNJICEOKFHAKOCKOGPDKHNGDMMBEFNIGMCHHMLLNALIAMDCOGLHPHIOPONKLHEJIELNEGNJBKPCEAKNLKNBEKHLCBMABFHECGHDKDFMKEIEIDABOBOIOFMMHMOBHIEMAIACEILIPIEAHAPNHJAHLIMBGGNBAPKDJMBGLHBPHBJLMAPNEBFJOBBLCOOALDIMCKLLPJNKOJCDILHCLALNCKLCDOPJOHHKHKGJGNMGJDLGICNGOMGNICKCPCFILOLGAMJIGDFGACDFDFBEEAJKPDBGMEAHGAPIJCKEHDFLPPBMOBAKPKLDONBKIEHEIDOEGNDOHJCDHBOFCMNKBGPIMLBGAAGNHDKGGMBFOPMNPBPJAENNOJDLCMFJFOGPMHHGABLGOEPJIDBNIDBCCHIPDNPDCPACBFFPBLPMOGIEOJLDEDGDADPIHOIEHHMHKE", wmotion: "W01" },
 };
@@ -1248,9 +1267,14 @@ function rankToKey(rank) {
 
 const activeAnims = {};
 
-function startAvatarAnim(imgEl, name, rank) {
+function startAvatarAnim(imgEl, name, rank, total) {
   if (activeAnims[name]) { clearInterval(activeAnims[name]); delete activeAnims[name]; }
   if (!STREAMERS[name]) { imgEl.style.display = "none"; return; }
+  // 0점이면 기본 서있는 표정 A00/E00
+  if (total === 0) {
+    imgEl.src = buildUrl(name, "A00", 0, "E00");
+    return;
+  }
   const anim = RANK_ANIM[rankToKey(rank)];
   let frame = 0;
   imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
@@ -1293,7 +1317,7 @@ function startRunnerAnim(imgEl, name) {
 }
 
 let prevJSON = "";
-let round3Revealed = false;
+let round5Revealed = false;
 let celebActive = false;
 let celebTimer = null;
 let currentFirstName = "";
@@ -1615,7 +1639,7 @@ function playCutscene(onComplete) {
   setTimeout(() => {
     const parts = [
       { text: "🫸🏻", type: "white" },
-      { text: "3",   type: "fire"  },
+      { text: "5",   type: "fire"  },
       { text: "라",  type: "fire"  },
       { text: "운",  type: "fire"  },
       { text: "드",  type: "fire"  },
@@ -1672,21 +1696,21 @@ function typeLength(chars, interval) { return chars * interval; }
 
 
 
-function revealR3Badges() {
-  // 상단 r3badge
-  const r3b = document.getElementById("r3badge");
-  r3b.style.display = "";
-  r3b.classList.remove("r3-header-done", "r3-header-in");
+function revealR5Badges() {
+  // 상단 r5badge
+  const r5b = document.getElementById("r5badge");
+  r5b.style.display = "";
+  r5b.classList.remove("r3-header-done", "r3-header-in");
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    r3b.classList.add("r3-header-in");
+    r5b.classList.add("r3-header-in");
     setTimeout(() => {
-      r3b.classList.remove("r3-header-in");
-      r3b.classList.add("r3-header-done");
+      r5b.classList.remove("r3-header-in");
+      r5b.classList.add("r3-header-done");
     }, 700);
   }));
 
   // 각 플레이어 뱃지 — 순차 등장 (DOM 조작 없음, CSS만)
-  const badges = document.querySelectorAll(".rs-badge.rs-r3");
+  const badges = document.querySelectorAll(".rs-badge.rs-r5");
   badges.forEach((el, i) => {
     el.classList.remove("r3-impact", "r3-done");
     el.style.display = "";
@@ -1705,26 +1729,26 @@ function revealR3Badges() {
 }
 
 
-function hideR3Badges() {
-  const r3b = document.getElementById("r3badge");
-  r3b.style.display = "none";
-  r3b.classList.remove("r3-header-in", "r3-header-done");
-  document.querySelectorAll(".rs-badge.rs-r3").forEach(el => {
+function hideR5Badges() {
+  const r5b = document.getElementById("r5badge");
+  r5b.style.display = "none";
+  r5b.classList.remove("r3-header-in", "r3-header-done");
+  document.querySelectorAll(".rs-badge.rs-r5").forEach(el => {
     el.style.display = "none";
     el.classList.remove("r3-impact", "r3-done", "locked", "decoding", "decoded");
   });
 }
 
-function toggleRound3() {
-  if (round3Revealed) {
-    round3Revealed = false;
+function toggleRound5() {
+  if (round5Revealed) {
+    round5Revealed = false;
     document.getElementById("lockBtn").textContent = "🔒";
-    hideR3Badges();
+    hideR5Badges();
   } else {
     playCutscene(() => {
-      round3Revealed = true;
+      round5Revealed = true;
       document.getElementById("lockBtn").textContent = "🔓";
-      revealR3Badges();
+      revealR5Badges();
     });
   }
 }
@@ -2041,6 +2065,18 @@ function render(data) {
   }
   data.sort((a, b) => Number(b["📝최종 점수"]) - Number(a["📝최종 점수"]));
   data = data.slice(0, 7);
+
+  // 동점 처리: 같은 점수면 같은 등수 부여
+  const rankMap = [];
+  let currentRank = 1;
+  for (let i = 0; i < data.length; i++) {
+    if (i > 0 && Number(data[i]["📝최종 점수"]) === Number(data[i-1]["📝최종 점수"])) {
+      rankMap.push(rankMap[i-1]);
+    } else {
+      currentRank = i + 1;
+      rankMap.push(currentRank);
+    }
+  }
   const json = JSON.stringify(data);
 
   if (json === prevJSON) return;
@@ -2065,14 +2101,17 @@ function render(data) {
   const r1 = getRoundBest(data, "👑1라운드");
   const r2 = getRoundBest(data, "👑2라운드");
   const r3 = getRoundBest(data, "👑3라운드");
+  const r4 = getRoundBest(data, "👑4라운드");
+  const r5 = getRoundBest(data, "👑5라운드");
   document.getElementById("roundSummary").style.display = "flex";
   document.getElementById("r1winner").innerHTML = '<span class="r-name">'+r1.name+'</span>'+(r1.pt?'<span class="r-pt">'+r1.pt+'pt</span>':'');
   document.getElementById("r2winner").innerHTML = '<span class="r-name">'+r2.name+'</span>'+(r2.pt?'<span class="r-pt">'+r2.pt+'pt</span>':'');
   document.getElementById("r3winner").innerHTML = '<span class="r-name">'+r3.name+'</span>'+(r3.pt?'<span class="r-pt">'+r3.pt+'pt</span>':'');
+  document.getElementById("r4winner").innerHTML = '<span class="r-name">'+r4.name+'</span>'+(r4.pt?'<span class="r-pt">'+r4.pt+'pt</span>':'');
 
   const maxScore = Math.max(...data.map(r => Number(r["📝최종 점수"]) || 0));
-  const rankFillClass  = ["fill-1","fill-2","fill-3","fill-o","fill-o","fill-o","fill-o"];
-  const rankBadgeClass = ["rank-1","rank-2","rank-3","rank-other","rank-other","rank-other","rank-other"];
+  const rankFillClasses  = ["fill-1","fill-2","fill-3","fill-o","fill-o","fill-o","fill-o"];
+  const rankBadgeClasses = ["rank-1","rank-2","rank-3","rank-other","rank-other","rank-other","rank-other"];
   const section = document.getElementById("raceSection");
   Object.keys(activeAnims).forEach(k => {
     if (k === "__celeb__") return;
@@ -2082,32 +2121,38 @@ function render(data) {
   section.innerHTML = "";
 
   data.forEach((row, i) => {
-    const rank  = i + 1;
+    const rank  = rankMap[i];
     const name  = row["🎙️스트리머"] || "?";
     const total = Number(row["📝최종 점수"]) || 0;
     const s1 = row["👑1라운드"] || "-";
     const s2 = row["👑2라운드"] || "-";
     const s3 = row["👑3라운드"] || "-";
+    const s4 = row["👑4라운드"] || "-";
+    const s5 = row["👑5라운드"] || "-";
     const pct = maxScore > 0 ? Math.min(93, Math.max(5, (total/maxScore)*88)) : 5;
+    const rankFillClass  = rankFillClasses[Math.min(rank-1, 6)];
+    const rankBadgeClass = rankBadgeClasses[Math.min(rank-1, 6)];
     const div = document.createElement("div");
     div.className = "race-row";
     div.innerHTML =
       '<div class="race-top">'+
-        '<div class="rank-badge '+rankBadgeClass[i]+'">'+rank+'</div>'+
+        '<div class="rank-badge '+rankBadgeClass+'">'+rank+'</div>'+
         '<div class="avatar-wrap"><img class="avatar-img" id="avatar_'+i+'" data-sname="'+name+'" src="" alt=""></div>'+
         '<div class="name-score">'+
           '<span class="streamer-name">'+name+'</span>'+
           '<span class="score-total">'+total.toLocaleString()+'</span><span class="score-label">pt</span>'+
         '</div>'+
         '<div class="round-scores">'+
-          '<div class="rs-badge"><div class="rs-r">👑1라운드</div><div class="rs-v">'+s1+'</div></div>'+
-          '<div class="rs-badge"><div class="rs-r">👑2라운드</div><div class="rs-v">'+s2+'</div></div>'+
-          '<div class="rs-badge rs-r3'+(round3Revealed ? ' r3-done' : '')+'" style="'+(round3Revealed ? '' : 'display:none')+'"><div class="rs-r">👑3라운드</div><div class="rs-v">'+s3+'</div></div>'+
+          '<div class="rs-badge"><div class="rs-r">🚩1라운드</div><div class="rs-v">'+s1+'</div></div>'+
+          '<div class="rs-badge"><div class="rs-r">🚩2라운드</div><div class="rs-v">'+s2+'</div></div>'+
+          '<div class="rs-badge"><div class="rs-r">🚩3라운드</div><div class="rs-v">'+s3+'</div></div>'+
+          '<div class="rs-badge"><div class="rs-r">🚩4라운드</div><div class="rs-v">'+s4+'</div></div>'+
+          '<div class="rs-badge rs-r5'+(round5Revealed ? ' r3-done' : '')+'" style="'+(round5Revealed ? '' : 'display:none')+'"><div class="rs-r">🏁5라운드</div><div class="rs-v">'+s5+'</div></div>'+
         '</div>'+
       '</div>'+
       '<div class="track-wrap">'+
         '<div class="track-bg">'+
-          '<div class="track-fill '+rankFillClass[i]+'" style="width:'+pct+'%"></div>'+
+          '<div class="track-fill '+rankFillClass+'" style="width:'+pct+'%"></div>'+
           '<div class="finish-line"></div>'+
         '</div>'+
         '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%">'+
@@ -2118,9 +2163,10 @@ function render(data) {
     if (i < data.length-1) {
       const hr = document.createElement("div"); hr.className = "row-divider"; section.appendChild(hr);
     }
-    startAvatarAnim(document.getElementById("avatar_"+i), name, rank);
+    startAvatarAnim(document.getElementById("avatar_"+i), name, rank, total);
     startRunnerAnim(document.getElementById("runner_"+i), name);
   });
+  if (data.length >= 7 && typeof startBgCrackAnim === "function") startBgCrackAnim();
 }
 
 async function fetchData() {
@@ -2136,10 +2182,460 @@ async function fetchData() {
 
 fetchData();
 setInterval(fetchData, 5000);
+
+// ── 배경 충돌 균열 애니메이션 ──────────────────────────────────
+(function () {
+  const canvas = document.getElementById("bgCrackCanvas");
+  const ctx    = canvas.getContext("2d");
+  let running  = false;
+  let raf      = null;
+  const cracks = [];
+
+  // 7명 색상
+  const COLORS = [
+    "#ff3300", // 빨강
+    "#ff9900", // 주황
+    "#ffdd00", // 노랑
+    "#44ff66", // 초록
+    "#44ccff", // 하늘
+    "#8844ff", // 보라
+    "#ff44bb", // 핑크
+  ];
+
+  function resize() {
+    const p = document.getElementById("panel");
+    canvas.width  = p.offsetWidth;
+    canvas.height = p.offsetHeight;
+  }
+
+  // 균열 생성
+  function genCrack(cx, cy) {
+    const arms = [];
+    const numArms = 3 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < numArms; i++) {
+      const angle  = (Math.PI * 2 / numArms) * i + (Math.random() - 0.5) * 0.5;
+      const length = 40 + Math.random() * 130;
+      const pts    = [{x: cx, y: cy}];
+      let x = cx, y = cy, a = angle;
+      const n = 5 + Math.floor(Math.random() * 6);
+      for (let s = 0; s < n; s++) {
+        const kink = Math.random() < 0.18
+          ? (Math.random() - 0.5) * 0.8
+          : (Math.random() - 0.5) * 0.12;
+        a += kink;
+        const segLen = (length / n) * (0.85 + Math.random() * 0.3);
+        x += Math.cos(a) * segLen;
+        y += Math.sin(a) * segLen;
+        pts.push({x, y});
+        if (Math.random() < 0.28 && s > 1 && s < n - 1) {
+          const sa  = a + (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
+          const sl  = length * (0.12 + Math.random() * 0.22);
+          const subPts = [{x, y}, {x: x + Math.cos(sa)*sl, y: y + Math.sin(sa)*sl}];
+          arms.push({ pts: subPts, sub: true, w: 0.5 + Math.random() * 0.5 });
+        }
+      }
+      arms.push({ pts, sub: false, w: 1.0 + Math.random() * 1.5 });
+    }
+    // 충격점 주변 콘크리트 파편 조각 (짧은 선분들)
+    const chips = [];
+    const chipCount = 3 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < chipCount; i++) {
+      const ca  = Math.random() * Math.PI * 2;
+      const cr  = 3 + Math.random() * 9;
+      const cl  = 4 + Math.random() * 10;
+      const ca2 = ca + (Math.random() - 0.5) * 1.0;
+      chips.push({
+        x1: cx + Math.cos(ca)  * cr,
+        y1: cy + Math.sin(ca)  * cr,
+        x2: cx + Math.cos(ca2) * (cr + cl),
+        y2: cy + Math.sin(ca2) * (cr + cl),
+      });
+    }
+    return { cx, cy, arms, chips, alpha: 0, target: 0.6 + Math.random() * 0.35 };
+  }
+
+  function drawCrack(c) {
+    if (c.alpha <= 0) return;
+
+    for (const arm of c.arms) {
+      const pts = arm.pts;
+      if (pts.length < 2) continue;
+      const w = arm.w;
+      const a = c.alpha * (arm.sub ? 0.4 : 1);
+
+      // 굵은 배경색 계열 - 파인 느낌 (어두운 빨강 반투명)
+      ctx.globalAlpha = a * 0.5;
+      ctx.strokeStyle = arm.sub ? "rgba(60,0,0,0.7)" : "rgba(80,0,0,0.75)";
+      ctx.lineWidth   = w * 2.8;
+      ctx.lineCap     = "round";
+      ctx.lineJoin    = "round";
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+
+      // 가는 코어 - 살짝 밝은 빨강으로 균열선 표시
+      ctx.globalAlpha = a * 0.55;
+      ctx.strokeStyle = arm.sub ? "rgba(120,10,10,0.65)" : "rgba(160,15,15,0.7)";
+      ctx.lineWidth   = w * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+    }
+
+    // 파편 조각
+    if (c.chips) {
+      for (const ch of c.chips) {
+        ctx.globalAlpha = c.alpha * 0.4;
+        ctx.strokeStyle = "rgba(90,0,0,0.7)";
+        ctx.lineWidth   = 1.5;
+        ctx.lineCap     = "round";
+        ctx.beginPath(); ctx.moveTo(ch.x1, ch.y1); ctx.lineTo(ch.x2, ch.y2); ctx.stroke();
+      }
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  // ── 충돌 이펙트: 피맛 + 콘크리트 파편 + 먼지 ──
+  const impactEffects = [];
+
+  function spawnImpactEffect(cx, cy, colors) {
+    const now = performance.now();
+
+    // ── 핏방울: 눈물 모양, 중력 받아 떨어짐 ──
+    const drops = [];
+    for (let i = 0; i < 28; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd   = 80 + Math.random() * 220;
+      const r     = 2 + Math.random() * 5;
+      drops.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd - 60, // 초반엔 위로 튀었다가
+        r,
+        life: 0.4 + Math.random() * 0.7,
+        trail: [],
+      });
+    }
+
+    // ── 핏줄기: 충돌점에서 방사형으로 뻗는 얇은 선 ──
+    const streaks = [];
+    for (let i = 0; i < 14; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const len   = 30 + Math.random() * 90;
+      const kink  = (Math.random() - 0.5) * 0.6; // 약간 꺾임
+      streaks.push({ angle, len, kink, life: 0.3 + Math.random() * 0.4 });
+    }
+
+    // ── 콘크리트 파편: 사각형 덩어리 ──
+    const chunks = [];
+    for (let i = 0; i < 18; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd   = 60 + Math.random() * 160;
+      chunks.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd - 40,
+        rot: Math.random() * Math.PI * 2,
+        rotV: (Math.random() - 0.5) * 18,
+        w: 4 + Math.random() * 10,
+        h: 3 + Math.random() * 7,
+        life: 0.5 + Math.random() * 0.6,
+      });
+    }
+
+    // ── 먼지 구름: 느리게 퍼지는 원들 ──
+    const dusts = [];
+    for (let i = 0; i < 10; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd   = 20 + Math.random() * 50;
+      dusts.push({
+        x: cx + (Math.random() - 0.5) * 20,
+        y: cy + (Math.random() - 0.5) * 20,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd - 15,
+        r: 8 + Math.random() * 20,
+        maxR: 30 + Math.random() * 50,
+        life: 0.6 + Math.random() * 0.5,
+      });
+    }
+
+    impactEffects.push({
+      born: now, totalDur: 900,
+      cx, cy, drops, streaks, chunks, dusts
+    });
+  }
+
+  function drawImpactEffects(now) {
+    for (let ei = impactEffects.length - 1; ei >= 0; ei--) {
+      const ef = impactEffects[ei];
+      const t  = (now - ef.born) / ef.totalDur;
+      if (t >= 1) { impactEffects.splice(ei, 1); continue; }
+      const sec = t * ef.totalDur * 0.001; // 초 단위
+
+      // ── 짙은 붉은 플래시 + 피 번짐 ──
+      if (t < 0.2) {
+        const fa = (1 - t / 0.2);
+        ctx.globalAlpha = fa * 0.88;
+        const fg = ctx.createRadialGradient(ef.cx, ef.cy, 0, ef.cx, ef.cy, 80 + 50 * t);
+        fg.addColorStop(0,   "rgba(180,0,0,1)");
+        fg.addColorStop(0.4, "rgba(100,0,0,0.7)");
+        fg.addColorStop(1,   "rgba(40,0,0,0)");
+        ctx.fillStyle = fg;
+        ctx.beginPath(); ctx.arc(ef.cx, ef.cy, 130 + 80 * t, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // ── 핏줄기: 충돌점에서 선이 빠르게 뻗음 ──
+      for (const sk of ef.streaks) {
+        const st = t / sk.life;
+        if (st >= 1) continue;
+        const eased = 1 - Math.pow(1 - Math.min(st * 3, 1), 2);
+        const drawLen = sk.len * eased;
+        const ex = ef.cx + Math.cos(sk.angle + sk.kink) * drawLen;
+        const ey = ef.cy + Math.sin(sk.angle + sk.kink) * drawLen;
+        ctx.globalAlpha = (1 - st) * 0.85;
+        ctx.strokeStyle = "rgba(140,0,0,0.9)";
+        ctx.lineWidth   = 1.5 + (1 - st) * 1.5;
+        ctx.lineCap     = "round";
+        ctx.beginPath();
+        ctx.moveTo(ef.cx, ef.cy);
+        // 중간 꺾임점
+        const mx = ef.cx + Math.cos(sk.angle) * drawLen * 0.5;
+        const my = ef.cy + Math.sin(sk.angle) * drawLen * 0.5;
+        ctx.quadraticCurveTo(mx + Math.cos(sk.angle + Math.PI/2) * sk.kink * 20,
+                             my + Math.sin(sk.angle + Math.PI/2) * sk.kink * 20, ex, ey);
+        ctx.stroke();
+        // 끝 방울
+        if (st > 0.4) {
+          const dropR = (1 - st) * 3.5;
+          ctx.globalAlpha = (1 - st) * 0.8;
+          ctx.fillStyle   = "rgba(160,0,0,0.9)";
+          ctx.beginPath(); ctx.arc(ex, ey, dropR, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      // ── 핏방울: 포물선으로 튀기며 중력 ──
+      for (const dp of ef.drops) {
+        const st = t / dp.life;
+        if (st >= 1) continue;
+        const gravity = 400;
+        const px = dp.x + dp.vx * sec;
+        const py = dp.y + dp.vy * sec + 0.5 * gravity * sec * sec;
+        const fa = (1 - st) * 0.9;
+
+        ctx.globalAlpha = fa;
+        ctx.fillStyle   = "rgba(150,0,0,0.95)";
+        // 눈물방울 모양: 타원으로 근사
+        ctx.beginPath();
+        ctx.ellipse(px, py, dp.r * 0.7, dp.r, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // 밝은 하이라이트
+        ctx.globalAlpha = fa * 0.4;
+        ctx.fillStyle   = "rgba(220,30,30,0.8)";
+        ctx.beginPath();
+        ctx.ellipse(px - dp.r * 0.15, py - dp.r * 0.2, dp.r * 0.25, dp.r * 0.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ── 콘크리트 파편 ──
+      for (const ck of ef.chunks) {
+        const st = t / ck.life;
+        if (st >= 1) continue;
+        const gravity = 300;
+        const px  = ck.x + ck.vx * sec;
+        const py  = ck.y + ck.vy * sec + 0.5 * gravity * sec * sec;
+        const rot = ck.rot + ck.rotV * sec;
+        ctx.globalAlpha = (1 - st) * 0.85;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(rot);
+        ctx.fillStyle   = "rgba(30,5,5,0.9)";
+        ctx.fillRect(-ck.w/2, -ck.h/2, ck.w, ck.h);
+        // 파편 테두리 (약간 밝게)
+        ctx.strokeStyle = "rgba(80,10,10,0.7)";
+        ctx.lineWidth   = 0.7;
+        ctx.strokeRect(-ck.w/2, -ck.h/2, ck.w, ck.h);
+        ctx.restore();
+      }
+
+      // ── 먼지/연기 구름 ──
+      for (const du of ef.dusts) {
+        const st = t / du.life;
+        if (st >= 1) continue;
+        const px   = du.x + du.vx * sec;
+        const py   = du.y + du.vy * sec;
+        const r    = du.r + (du.maxR - du.r) * st; // 커지면서
+        const fa   = (1 - st) * 0.18;
+        ctx.globalAlpha = fa;
+        const dg = ctx.createRadialGradient(px, py, 0, px, py, r);
+        dg.addColorStop(0, "rgba(60,5,5,0.6)");
+        dg.addColorStop(1, "rgba(20,0,0,0)");
+        ctx.fillStyle = dg;
+        ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawParticle(p, alpha) {
+    if (!p) return;
+    for (let i = 0; i < p.trail.length; i++) {
+      const tf = i / p.trail.length;
+      const tr = p.trail[i];
+      ctx.globalAlpha = tf * tf * 0.35 * alpha;
+      ctx.fillStyle   = p.color;
+      ctx.beginPath();
+      ctx.arc(tr.x, tr.y, 3 + tf * 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = alpha;
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 28);
+    g.addColorStop(0,   "#ffffff");
+    g.addColorStop(0.3, p.color);
+    g.addColorStop(1,   "transparent");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 28, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawImpactShock(cx, cy, r, alpha, color) {
+    // 더 이상 사용 안 함 - spawnImpactEffect로 대체
+  }
+
+  // ── 7개 충돌체: 랜덤 위치에서 랜덤 만남점으로 ──
+  // phase: "waiting" → 30초 대기 → "approach" → "impact" → "reset" → "waiting"
+  const APPROACH_MS = 900;
+  const IMPACT_MS   = 300;
+  const RESET_MS    = 800;
+  const WAIT_MS     = 20000; // 20초 대기
+
+  let phase  = "waiting";
+  let phaseT = 0;
+  let particles = [];   // 7개
+  let meetX = 0, meetY = 0;
+  let impactR = 0, impactAlpha = 0;
+  let lastNow = 0;
+
+  function randomEdgePoint(W, H) {
+    // 4개 모서리 중 하나에서 시작 (좌/우/상/하 가장자리)
+    const edge = Math.floor(Math.random() * 4);
+    if (edge === 0) return { x: 0,   y: Math.random() * H };         // 왼쪽
+    if (edge === 1) return { x: W,   y: Math.random() * H };         // 오른쪽
+    if (edge === 2) return { x: Math.random() * W, y: 0 };           // 위
+                    return { x: Math.random() * W, y: H };            // 아래
+  }
+
+  function startApproach() {
+    const W = canvas.width, H = canvas.height;
+    // 만남점: 표 안 랜덤 (가장자리 피함)
+    meetX = W * (0.2 + Math.random() * 0.6);
+    meetY = H * (0.2 + Math.random() * 0.6);
+
+    // 7개 충돌체 각자 다른 가장자리에서 출발, 색상 다 다르게
+    particles = COLORS.map((color, i) => {
+      const start = randomEdgePoint(W, H);
+      return { x: start.x, y: start.y, sx: start.x, sy: start.y, color, trail: [] };
+    });
+
+    impactR = 0; impactAlpha = 0;
+    phase = "approach"; phaseT = 0;
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function easeInQuad(t) { return t * t; }
+
+  function spawnCracks(mx, my) {
+    const count = 2 + Math.floor(Math.random() * 4);
+    const spots = [{ cx: mx, cy: my }];
+    for (let i = 1; i < count; i++) {
+      spots.push({
+        cx: mx + (Math.random() - 0.5) * canvas.width  * 0.55,
+        cy: my + (Math.random() - 0.5) * canvas.height * 0.55,
+      });
+    }
+    spots.forEach(({ cx, cy }) => {
+      const ccx = Math.max(20, Math.min(canvas.width  - 20, cx));
+      const ccy = Math.max(20, Math.min(canvas.height - 20, cy));
+      const cr  = genCrack(ccx, ccy);
+      cr.bornAt  = performance.now();
+      cr.fadeDur = 120 + Math.random() * 200;
+      cracks.push(cr);
+    });
+  }
+
+  function tick(now) {
+    raf = requestAnimationFrame(tick); // ← 맨 첫 줄: 어떤 상황에서도 루프 유지
+    if (!running) return;
+    const dt = Math.min(now - lastNow, 50);
+    lastNow  = now;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (const c of cracks) {
+      if (c.alpha < c.target) {
+        c.alpha = Math.min((now - c.bornAt) / c.fadeDur, 1) * c.target;
+      }
+      drawCrack(c);
+    }
+
+    phaseT += dt;
+
+    if (phase === "waiting") {
+      if (phaseT >= WAIT_MS) startApproach();
+
+    } else if (phase === "approach") {
+      const raw = phaseT / APPROACH_MS;
+      const t   = Math.min(raw, 1);
+      const e   = t * t;
+
+      for (const p of particles) {
+        const nx = lerp(p.sx, meetX, e);
+        const ny = lerp(p.sy, meetY, e);
+        p.trail.push({ x: p.x, y: p.y });
+        if (p.trail.length > 14) p.trail.shift();
+        p.x = nx;
+        p.y = ny;
+        drawParticle(p, 0.9);
+      }
+
+      if (raw >= 1) {
+        phase = "impact"; phaseT = 0;
+        spawnCracks(meetX, meetY);
+        spawnImpactEffect(meetX, meetY, COLORS);
+        particles = []; // 충돌 즉시 클리어
+      }
+
+    } else if (phase === "impact") {
+      const t = Math.min(phaseT / IMPACT_MS, 1);
+      if (t >= 1) { phase = "reset"; phaseT = 0; }
+
+    } else if (phase === "reset") {
+      if (phaseT >= RESET_MS) { phase = "waiting"; phaseT = 0; }
+    }
+
+    drawImpactEffects(now);
+  }
+
+  window.startBgCrackAnim = function () {
+    if (running) return;
+    running = true;
+    resize();
+    canvas.classList.add("visible");
+    lastNow = performance.now();
+    startApproach();
+    requestAnimationFrame(tick);
+  };
+
+  window.addEventListener("resize", () => { if (running) resize(); });
+})();
 </script>
 </div>
 </body>
 </html>
+
 
 
 
