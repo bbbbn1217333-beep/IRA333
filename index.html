@@ -1259,11 +1259,11 @@ function rankToKey(rank) {
 
 const activeAnims = {};
 
-function startAvatarAnim(imgEl, name, rank, total) {
+function startAvatarAnim(imgEl, name, rank, total, hasAnyScore) {
   if (activeAnims[name]) { clearInterval(activeAnims[name]); delete activeAnims[name]; }
   if (!STREAMERS[name]) { imgEl.style.display = "none"; return; }
-  // 0점이면 기본 서있는 표정 A00/E00
-  if (total === 0) {
+  // 라운드 점수가 하나도 기록되지 않은 경우(전부 빈셀/-)에만 기본 표정
+  if (!hasAnyScore) {
     imgEl.src = buildUrl(name, "A00", 0, "E00");
     return;
   }
@@ -1823,7 +1823,7 @@ function applyFinishEffects(winnerName) {
   });
 
   const winnerAvatar = document.getElementById("avatar_0");
-  if (winnerAvatar && winnerName) startAvatarAnim(winnerAvatar, winnerName, 1);
+  if (winnerAvatar && winnerName) startAvatarAnim(winnerAvatar, winnerName, 1, 0, true);
 }
 
 function clearFinishEffects() {
@@ -2118,6 +2118,8 @@ function render(data) {
     const _r3 = row["👑3라운드"]; const s3 = (_r3 !== undefined && _r3 !== null && _r3 !== "") ? String(_r3) : "-";
     const _r4 = row["👑4라운드"]; const s4 = (_r4 !== undefined && _r4 !== null && _r4 !== "") ? String(_r4) : "-";
     const _r5 = row["👑5라운드"]; const s5 = (_r5 !== undefined && _r5 !== null && _r5 !== "") ? String(_r5) : "-";
+    // 라운드 점수가 하나라도 실제로 기록됐는지 (0점 포함, 빈셀/- 제외)
+    const hasAnyScore = [s1, s2, s3, s4, s5].some(s => s !== "-");
     const e1 = max1 && Number(s1)===max1 ? '👑' : '🚩';
     const e2 = max2 && Number(s2)===max2 ? '👑' : '🚩';
     const e3 = max3 && Number(s3)===max3 ? '👑' : '🚩';
@@ -2162,7 +2164,7 @@ function render(data) {
     if (i < data.length-1) {
       const hr = document.createElement("div"); hr.className = "row-divider"; section.appendChild(hr);
     }
-    startAvatarAnim(document.getElementById("avatar_"+i), name, rank, total);
+    startAvatarAnim(document.getElementById("avatar_"+i), name, rank, total, hasAnyScore);
     startRunnerAnim(document.getElementById("runner_"+i), name);
   });
   if (data.length >= 7 && typeof startBgCrackAnim === "function") startBgCrackAnim();
