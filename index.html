@@ -639,32 +639,39 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   gap: 0;
   border: 4px solid #ff4444;
   border-radius: 14px;
-  padding: 8px 20px 14px;
   background: rgba(0,0,0,0.35);
   animation: winnerGlow 1.2s ease-in-out infinite;
   overflow: visible;
+  /* 단독우승 박스와 동일한 크기 */
+  width: min(480px, 70%);
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  padding: 0;
+  position: relative;
 }
 .celeb-co-chars-row {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  margin-bottom: -80px;
-  position: relative;
-  top: -20px;          
+  position: absolute;
+  bottom: 60px; /* 이름/타이틀 영역 위 */
+  left: 0; right: 0;
+  pointer-events: none;
 }
 .celeb-co-char {
-  width: 360px;
-  height: 360px;
-  flex-shrink: 0;
+  width: 300px;
+  height: 300px;
+  flex-shrink: 1;
   object-fit: contain;
   transform: scaleX(-1);
   image-rendering: auto;
   display: block;
-  margin: 0 -150px;
+  margin: 0 -110px;
 }
 .celeb-co-name {
   font-size: clamp(14px, 3vw, 24px);
@@ -673,8 +680,9 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   letter-spacing: 0;
   white-space: nowrap;
   text-align: center;
-  margin-top: 4px;
-  position: relative;
+  position: absolute;
+  bottom: 6%;
+  left: 0; right: 0;
   z-index: 5;
   text-shadow:
     0 0 2px #ffffff,
@@ -1724,7 +1732,7 @@ function startCelebAnim(winners) {
 
     // 공동 우승!!! 타이틀 (캐릭터 아래)
     const titleEl = document.createElement("div");
-    titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);margin-top:-60px;position:relative;z-index:5;";
+    titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);position:absolute;bottom:calc(6% + 1.4em);left:0;right:0;z-index:5;";
     titleEl.textContent = "🏆 공동 우승!!! 🏆";
     charBox.appendChild(titleEl);
 
@@ -2374,7 +2382,11 @@ function clearFinishEffects() {
   });
   document.querySelectorAll(".track-wrap").forEach(el => el.classList.remove("finish-active"));
   document.querySelectorAll(".runner-icon").forEach(el => {
-    el.classList.remove("frozen", "finish-runner");
+    el.classList.remove("frozen");
+    // 1등 러너는 골인 위치 유지 (finish-runner 클래스 및 위치 그대로)
+    if (!el.classList.contains("is-first")) {
+      el.classList.remove("finish-runner");
+    }
     el.style.opacity = "";
   });
   document.querySelectorAll(".avatar-img").forEach(el => el.classList.remove("frozen"));
@@ -2729,6 +2741,15 @@ function playFinishGaugeScene(winnerName, onComplete) {
         const pct = getPctAtT(pi, t);
         fillDivs[pi].style.width  = pct + '%';
         runnerDivs[pi].style.left = pct + '%';
+        // 캐릭터가 오른쪽 경계에 가까워질수록 transform 오프셋 조정 (짤림 방지)
+        // pct 90%~100% 구간에서 translate X를 -50%에서 -100%로 점진적으로 이동
+        if (pct >= 90) {
+          const ratio = (pct - 90) / 10; // 0~1
+          const offsetX = -50 - ratio * 50; // -50% ~ -100%
+          runnerDivs[pi].style.transform = `translate(${offsetX}%, -100%)`;
+        } else {
+          runnerDivs[pi].style.transform = 'translate(-50%, -100%)';
+        }
       });
       if (t < 1) requestAnimationFrame(step);
       else {
@@ -2752,6 +2773,7 @@ function playFinishGaugeScene(winnerName, onComplete) {
         runnerImgs[pi].src = buildUrl(pl.sname, "A05", cf, "E09");
         // 골인 위치로 이동
         runnerDivs[pi].style.left = "100%";
+        runnerDivs[pi].style.transform = "translate(-100%, -100%)";
         fillDivs[pi].style.width = "100%";
         const ci = setInterval(() => {
           cf = (cf+1) % 2;
@@ -3139,7 +3161,7 @@ function render(data) {
           '<div class="track-fill '+rankFillClass+'" style="width:'+pct+'%"></div>'+
           '<div class="finish-line"></div>'+
         '</div>'+
-        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%">'+
+        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%;'+(rank===1 && pct>=90 ? 'transform:translate('+(-50-(pct-90)/10*50)+'%,-100%)' : '')+'">'+
           '<img id="runner_'+i+'" src="" alt="">'+
         '</div>'+
       '</div>';
