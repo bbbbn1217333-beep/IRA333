@@ -409,7 +409,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   animation: firstRunnerAura 1.5s ease-in-out infinite !important;
 }
 .runner-icon.is-first::after {
-  content: '⭐'; position: absolute; top: -8px; left: 50%;
+  content: '👑'; position: absolute; top: -8px; left: 50%;
   transform: translateX(-50%); font-size: 7px;
   animation: bounce 0.8s ease infinite alternate;
 }
@@ -648,17 +648,67 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 #finishGaugeOverlay.active #fgoInner { opacity: 1; }
 
 /* 상단 라벨 */
+/* ── 골드 트로피 배너 shimmer ── */
+@keyframes goldShimmer {
+  0%   { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+@keyframes bannerLineGlow {
+  0%,100% { opacity: 0.5; box-shadow: 0 0 4px rgba(255,200,0,0.3); }
+  50%     { opacity: 1;   box-shadow: 0 0 10px rgba(255,220,0,0.7); }
+}
+@keyframes crownBob {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%     { transform: translateY(-2px) scale(1.08); }
+}
+
 #fgoEventTitle {
   text-align: center;
-  font-family: 'Pretendard','Noto Sans KR',sans-serif;
-  font-size: 13px; font-weight: 700; letter-spacing: 3px;
-  color: #ffb3b3;
-  text-shadow: 0 0 8px rgba(255,100,100,0.6);
-  margin-bottom: 2px;
+  margin-bottom: 6px;
   opacity: 0;
-  transition: opacity 0.3s ease 0.1s;
+  transition: opacity 0.4s ease 0.1s;
 }
 #finishGaugeOverlay.active #fgoEventTitle { opacity: 1; }
+
+.fgo-banner-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.fgo-banner-line {
+  flex: 1;
+  height: 2px;
+  max-width: 60px;
+  background: linear-gradient(90deg, transparent, #ffd700, #fff8a0, #ffd700, transparent);
+  border-radius: 2px;
+  animation: bannerLineGlow 2s ease-in-out infinite;
+}
+.fgo-banner-line.right {
+  background: linear-gradient(270deg, transparent, #ffd700, #fff8a0, #ffd700, transparent);
+}
+.fgo-banner-crown {
+  font-size: 16px;
+  animation: crownBob 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,200,0,0.8));
+}
+.fgo-banner-text {
+  font-family: 'Pretendard','Noto Sans KR',sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  white-space: nowrap;
+  background: linear-gradient(90deg,
+    #b8860b 0%, #ffd700 20%, #fff8a0 35%, #ffd700 50%,
+    #fff8a0 65%, #ffd700 80%, #b8860b 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(255,200,0,0.5));
+}
 
 #fgoTitle {
   text-align: center;
@@ -1336,7 +1386,15 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <canvas id="bgCrackCanvas"></canvas>
   <div id="finishGaugeOverlay">
     <div id="fgoInner">
-      <div id="fgoEventTitle">📋 이라333배 메이플 개맞짱 컨텐츠 최종순위</div>
+      <div id="fgoEventTitle">
+    <div class="fgo-banner-wrap">
+      <div class="fgo-banner-line"></div>
+      <span class="fgo-banner-crown">🏆</span>
+      <span class="fgo-banner-text">이라333배 메이플 개맞짱 최종순위</span>
+      <span class="fgo-banner-crown">🏆</span>
+      <div class="fgo-banner-line right"></div>
+    </div>
+  </div>
   <div id="fgoTitle"></div>
       <div id="fgoRoundLabel">▶ 1라운드</div>
       <div id="fgoAllRaces"></div>
