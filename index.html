@@ -381,7 +381,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 10001;
   width: 100%; padding: 0 10px;
   animation: boxPop 0.5s cubic-bezier(0.34,1.6,0.64,1) both;
-  max-height: 100%; overflow: hidden;
+  max-height: 100%; overflow: visible;
 }
 @keyframes boxPop { from { transform: translate(-50%,-50%) scale(0.3) rotate(-8deg); opacity:0; } to { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; } }
 @keyframes winnerGlow {
@@ -992,6 +992,12 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 .cs-alert-left  { left: 0;  background: linear-gradient(90deg, rgba(255,30,30,0.6), transparent); }
 .cs-alert-right { right: 0; background: linear-gradient(270deg, rgba(255,30,30,0.6), transparent); }
+.cs-alert-top, .cs-alert-bottom {
+  position: absolute; left: 0; right: 0; height: 60px;
+  z-index: 2; pointer-events: none; opacity: 0;
+}
+.cs-alert-top    { top: 0;    background: linear-gradient(180deg, rgba(255,30,30,0.6), transparent); }
+.cs-alert-bottom { bottom: 0; background: linear-gradient(0deg,   rgba(255,30,30,0.6), transparent); }
 @keyframes alertPulse {
   0%,100% { opacity: 0; }
   10%,90% { opacity: 0.9; }
@@ -1098,6 +1104,8 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   <div id="csShakeWrap" style="position:absolute;inset:0;pointer-events:none;">
     <div class="cs-alert-left"  id="csAlertL"></div>
     <div class="cs-alert-right" id="csAlertR"></div>
+    <div class="cs-alert-top"    id="csAlertT"></div>
+    <div class="cs-alert-bottom" id="csAlertB"></div>
     <div class="cs-vignette"    id="csVignette"></div>
     <div class="cs-countdown"   id="csCountdown"></div>
     <div class="cs-embers"      id="csEmbers"></div>
@@ -1208,11 +1216,11 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
     <div style="width:80px"></div>
   </div>
   <div class="race-section" id="raceSection">
+  </div>
   <div class="footer">
     <div class="live-dot"></div>
     <span class="live-text">IRA333</span>
   </div>
-</div>
 
 
 
@@ -1357,6 +1365,8 @@ function playCutscene(onComplete) {
   const beamsWrap = document.getElementById("csBeams");
   const alertL    = document.getElementById("csAlertL");
   const alertR    = document.getElementById("csAlertR");
+  const alertT    = document.getElementById("csAlertT");
+  const alertB    = document.getElementById("csAlertB");
   const vignette  = document.getElementById("csVignette");
   const countdown = document.getElementById("csCountdown");
   const embers    = document.getElementById("csEmbers");
@@ -1377,6 +1387,8 @@ function playCutscene(onComplete) {
   fadeout.style.animation = "none"; fadeout.style.opacity = "0";
   alertL.style.animation = "none"; alertL.style.opacity = "0";
   alertR.style.animation = "none"; alertR.style.opacity = "0";
+  alertT.style.animation = "none"; alertT.style.opacity = "0";
+  alertB.style.animation = "none"; alertB.style.opacity = "0";
   vignette.style.animation = "none"; vignette.style.opacity = "0";
   countdown.style.animation = "none"; countdown.style.opacity = "0";
   embers.innerHTML = "";
@@ -1547,8 +1559,14 @@ function playCutscene(onComplete) {
   setTimeout(() => {
     alertL.style.animation = "alertPulse 0.4s ease 3";
     alertR.style.animation = "alertPulse 0.4s ease 3 0.2s";
+    alertT.style.animation = "alertPulse 0.4s ease 3";
+    alertB.style.animation = "alertPulse 0.4s ease 3 0.2s";
     alertL.style.opacity = "1"; alertR.style.opacity = "1";
-    setTimeout(() => { alertL.style.opacity="0"; alertR.style.opacity="0"; }, 1800);
+    alertT.style.opacity = "1"; alertB.style.opacity = "1";
+    setTimeout(() => {
+      alertL.style.opacity="0"; alertR.style.opacity="0";
+      alertT.style.opacity="0"; alertB.style.opacity="0";
+    }, 1800);
   }, t); t += 200;
 
   // 9) 빛 폭발 + 빔
