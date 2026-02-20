@@ -404,6 +404,10 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   image-rendering: auto;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
+/* 골인 시 캐릭터가 트랙 끝에서 짤리지 않도록 오프셋 */
+.runner-icon.finish-runner {
+  left: calc(100% - 13px) !important;
+}
 /* finish-runner일 때 firstRunnerAura 오버라이드 */
 .runner-icon.is-first.finish-runner img {
   animation: firstRunnerAura 1.5s ease-in-out infinite !important;
@@ -624,6 +628,62 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 @keyframes mesoFall { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity:1; } 80% { opacity:1; } 100% { transform: translateY(var(--fall)) rotate(var(--rot)) scale(0.5); opacity:0; } }
 .sparkle { font-size: 12px; animation: sparkleFly var(--dur) ease-out forwards; }
 @keyframes sparkleFly { 0% { transform: translate(0,0) scale(0) rotate(0deg); opacity:1; } 50% { transform: translate(var(--mx),var(--my)) scale(1.2) rotate(180deg); opacity:1; } 100% { transform: translate(calc(var(--mx)*1.5),calc(var(--my)*1.5 + 30px)) scale(0) rotate(360deg); opacity:0; } }
+/* ── 공동우승 레이아웃: 하나의 박스 ── */
+.celeb-co-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.celeb-co-charbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  border: 4px solid #ff4444;
+  border-radius: 14px;
+  padding: 8px 20px 14px;
+  background: rgba(0,0,0,0.35);
+  animation: winnerGlow 1.2s ease-in-out infinite;
+  overflow: visible;
+}
+.celeb-co-chars-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: -80px;
+  position: relative;
+  top: -20px;          
+}
+.celeb-co-char {
+  width: 360px;
+  height: 360px;
+  flex-shrink: 0;
+  object-fit: contain;
+  transform: scaleX(-1);
+  image-rendering: auto;
+  display: block;
+  margin: 0 -150px;
+}
+.celeb-co-name {
+  font-size: clamp(14px, 3vw, 24px);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-align: center;
+  margin-top: 4px;
+  position: relative;
+  z-index: 5;
+  text-shadow:
+    0 0 2px #ffffff,
+    0 0 14px rgba(255,150,150,0.9),
+    0 0 32px rgba(255,80,80,0.7),
+    3px 3px 0 rgba(0,0,0,0.9);
+  animation: nameGlow 1.4s ease-in-out infinite;
+}
+
 .footer {
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: flex-end;
@@ -1513,12 +1573,14 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
     <div id="drumrollBar"><div id="drumrollBarFill"></div></div>
   </div>
   <div id="celebOverlay">
-    <div class="celeb-box">
-      <div class="celeb-char-wrap">
+    <div class="celeb-box" id="celebBox">
+      <!-- 단독 우승 (기본) -->
+      <div class="celeb-char-wrap" id="celebSingle">
         <img class="celeb-char" id="celebChar" src="" alt="">
         <div class="celeb-title">🏆 우승!!! 🏆</div>
         <div class="celeb-name" id="celebWinner"></div>
       </div>
+      <!-- 공동 우승 (JS에서 동적 생성) -->
     </div>
   </div>
   <div class="header">
@@ -1595,22 +1657,92 @@ function startAvatarAnim(imgEl, name, rank, total, hasAnyScore) {
   }, 300);
 }
 
-function startCelebAnim(name) {
-  const imgEl = document.getElementById("celebChar");
-  if (!imgEl || !STREAMERS[name]) return;
-  if (activeAnims["__celeb__"]) { clearInterval(activeAnims["__celeb__"]); delete activeAnims["__celeb__"]; }
-  const anim = RANK_ANIM["cheer"];
-  let frame = 0;
-  imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
-  frame = (frame + 1) % anim.frames;
-  activeAnims["__celeb__"] = setInterval(() => {
-    imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
-    frame = (frame + 1) % anim.frames;
-  }, 300);
+function startCelebAnim(winners) {
+  // winners: 배열 (단독이어도 배열로)
+  if (!Array.isArray(winners)) winners = [winners];
+
+  // 기존 애니 정리
+  Object.keys(activeAnims).filter(k => k.startsWith("__celeb__")).forEach(k => {
+    clearInterval(activeAnims[k]); delete activeAnims[k];
+  });
+
+  const celebBox = document.getElementById("celebBox");
+  const celebSingle = document.getElementById("celebSingle");
+
+  if (winners.length === 1) {
+    // 단독 우승
+    celebSingle.style.display = "";
+    // 공동우승 엘리먼트 제거
+    celebBox.querySelectorAll(".celeb-co-wrap").forEach(el => el.remove());
+
+    const imgEl = document.getElementById("celebChar");
+    document.getElementById("celebWinner").textContent = winners[0] || "";
+    const name = winners[0];
+    if (imgEl && STREAMERS[name]) {
+      const anim = RANK_ANIM["cheer"];
+      let frame = 0;
+      imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
+      frame = 1 % anim.frames;
+      activeAnims["__celeb__0"] = setInterval(() => {
+        imgEl.src = buildUrl(name, anim.action, frame, anim.emotion);
+        frame = (frame + 1) % anim.frames;
+      }, 300);
+    }
+  } else {
+    // 공동 우승 - 하나의 박스에 캐릭터들 나란히
+    celebSingle.style.display = "none";
+    celebBox.querySelectorAll(".celeb-co-wrap").forEach(el => el.remove());
+
+    const coWrap = document.createElement("div");
+    coWrap.className = "celeb-co-wrap";
+
+    // 캐릭터들 담는 박스
+    const charBox = document.createElement("div");
+    charBox.className = "celeb-co-charbox";
+
+    // 캐릭터들 가로 배치 (먼저)
+    const charsRow = document.createElement("div");
+    charsRow.className = "celeb-co-chars-row";
+
+    winners.forEach((name, wi) => {
+      const img = document.createElement("img");
+      img.className = "celeb-co-char";
+      img.alt = name;
+      if (STREAMERS[name]) {
+        const anim = RANK_ANIM["cheer"];
+        let frame = 0;
+        img.src = buildUrl(name, anim.action, frame, anim.emotion);
+        frame = 1 % anim.frames;
+        activeAnims["__celeb__" + wi] = setInterval(() => {
+          img.src = buildUrl(name, anim.action, frame, anim.emotion);
+          frame = (frame + 1) % anim.frames;
+        }, 300);
+      }
+      charsRow.appendChild(img);
+    });
+    charBox.appendChild(charsRow);
+
+    // 공동 우승!!! 타이틀 (캐릭터 아래)
+    const titleEl = document.createElement("div");
+    titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);margin-top:-60px;position:relative;z-index:5;";
+    titleEl.textContent = "🏆 공동 우승!!! 🏆";
+    charBox.appendChild(titleEl);
+
+    // 스트리머명 (타이틀 바로 아래)
+    const nameEl = document.createElement("div");
+    nameEl.className = "celeb-co-name";
+    nameEl.textContent = winners.join(", ");
+    charBox.appendChild(nameEl);
+
+    coWrap.appendChild(charBox);
+    celebBox.appendChild(coWrap);
+  }
 }
 
 function stopCelebAnim() {
-  if (activeAnims["__celeb__"]) { clearInterval(activeAnims["__celeb__"]); delete activeAnims["__celeb__"]; }
+  Object.keys(activeAnims).filter(k => k.startsWith("__celeb__")).forEach(k => {
+    clearInterval(activeAnims[k]); delete activeAnims[k];
+  });
 }
 
 function startRunnerAnim(imgEl, name) {
@@ -1631,6 +1763,7 @@ let round5Revealed = false;
 let celebActive = false;
 let celebTimer = null;
 let currentFirstName = "";
+let currentWinners = []; // 공동우승 목록
 let finishTriggered = false;
 let finishApplied = false;
 let cutscenePlaying = false;
@@ -2152,70 +2285,77 @@ function applyFinishEffects(winnerName) {
 
   // 모든 달리기 애니메이션 중지
   Object.keys(activeAnims).forEach(k => {
-    if (k === "__celeb__") return;
+    if (k.startsWith("__celeb__")) return;
     clearInterval(activeAnims[k]);
     delete activeAnims[k];
   });
 
   // 1등 제외한 플레이어만 frozen
   document.querySelectorAll(".avatar-img").forEach(el => {
-    // avatar_0이 1등이므로 frozen 처리 (나중에 _finishRevealRunner에서 해제)
     el.classList.add("frozen");
   });
   document.querySelectorAll(".runner-icon").forEach(el => {
-    // is-first runner는 frozen 처리하되 나중에 _finishRevealRunner에서 해제
     el.classList.add("frozen");
   });
 
-  // 컷씬 끝나면 호출: 바깥 1등 골인 위치 + 꺄륵 포즈 + 게이지 100%
-  const fill1 = document.querySelector(".track-fill.fill-1");
-  const firstRunner = document.querySelector(".runner-icon.is-first");
+  // 공동 1등 러너 모두 처리
+  const winners = currentWinners.length > 0 ? currentWinners : [winnerName];
+  const firstRunners = Array.from(document.querySelectorAll(".runner-icon.is-first"));
 
   window._finishRevealRunner = function() {
-    // 게이지 100%로
-    if (fill1) {
+    // 공동 1등 게이지 모두 100%로
+    document.querySelectorAll(".track-fill.fill-1").forEach(fill1 => {
       fill1.classList.add("finish-glow");
       fill1.style.transition = "width 0.5s ease";
       fill1.style.width = "100%";
       const trackWrap = fill1.closest(".track-wrap");
       if (trackWrap) trackWrap.classList.add("finish-active");
-    }
-    // 1등 runner frozen 완전 해제 + 골인 위치 + 꺄륵 포즈
-    if (firstRunner) {
+    });
+
+    // 공동 1등 runner 모두 골인 위치 + 꺄륵 포즈
+    firstRunners.forEach(firstRunner => {
+      // 해당 runner의 스트리머 이름 찾기
+      const row = firstRunner.closest(".race-row");
+      const nameEl = row ? row.querySelector(".streamer-name") : null;
+      const rName = nameEl ? (nameEl.dataset.sname || nameEl.textContent.trim()) : winnerName;
+
       firstRunner.classList.remove("frozen");
       firstRunner.classList.add("finish-runner");
-      firstRunner.style.left = "100%";
+      // finish-runner CSS로 left 자동 처리되므로 style.left 제거
+      firstRunner.style.left = "";
       firstRunner.style.opacity = "1";
       const runnerImg = firstRunner.querySelector("img");
       if (runnerImg) {
         runnerImg.style.opacity = "1";
         runnerImg.style.filter = "drop-shadow(0 2px 4px rgba(0,0,0,0.8))";
-        if (STREAMERS[winnerName]) {
+        if (STREAMERS[rName]) {
           let cFrame = 0;
-          runnerImg.src = buildUrl(winnerName, "A05", cFrame, "E09");
+          runnerImg.src = buildUrl(rName, "A05", cFrame, "E09");
           const ci = setInterval(() => {
             cFrame = (cFrame + 1) % 2;
-            runnerImg.src = buildUrl(winnerName, "A05", cFrame, "E09");
+            runnerImg.src = buildUrl(rName, "A05", cFrame, "E09");
           }, 300);
-          const key = "runner_cheer_" + winnerName;
+          const key = "runner_cheer_" + rName;
           if (activeAnims[key]) clearInterval(activeAnims[key]);
           activeAnims[key] = ci;
         }
       }
-    }
-    // 1등 아바타 frozen 완전 해제 + 선명하게 복구
-    const winnerAvatar = document.getElementById("avatar_0");
-    if (winnerAvatar && winnerName) {
-      winnerAvatar.classList.remove("frozen");
-      winnerAvatar.style.opacity = "1";
-      winnerAvatar.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
-      startAvatarAnim(winnerAvatar, winnerName, 1, 0, true);
-    }
-    // 2~7등 아바타: 1등처럼 선명하게 표시
-    document.querySelectorAll(".avatar-img.frozen").forEach(el => {
-      el.style.opacity = "1";
-      el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
     });
+
+    // 1등 아바타 모두 frozen 해제 + 선명하게
+    document.querySelectorAll(".avatar-img").forEach(el => {
+      const sname = el.dataset.sname || "";
+      if (winners.includes(sname)) {
+        el.classList.remove("frozen");
+        el.style.opacity = "1";
+        el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
+        startAvatarAnim(el, sname, 1, 0, true);
+      } else {
+        el.style.opacity = "1";
+        el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
+      }
+    });
+
     // 달리기 아바타(runner)는 그대로 반투명 유지
     document.querySelectorAll(".runner-icon.frozen img").forEach(el => {
       el.style.opacity = "0.3";
@@ -2368,7 +2508,6 @@ function playFinishGaugeScene(winnerName, onComplete) {
   });
 
   // 게이지 위치: 0~100% 범위 (1등은 최종에 정확히 100%)
-  const winnerIdx = players.findIndex(p => p.isFirst);
   function toPct(cum, maxCum) {
     if (maxCum <= 0) return 0;
     return Math.min(100, Math.max(0, (cum / maxCum) * 100));
@@ -2384,8 +2523,9 @@ function playFinishGaugeScene(winnerName, onComplete) {
   // (1등이 없으면 평균)
   const markerPcts = [];
   for (let r = 0; r < NUM_ROUNDS; r++) {
-    if (winnerIdx >= 0) {
-      markerPcts.push(roundGauge[winnerIdx][r]);
+    const firstIdx = players.findIndex(p => p.isFirst);
+    if (firstIdx >= 0) {
+      markerPcts.push(roundGauge[firstIdx][r]);
     } else {
       const avg = players.reduce((s,_,pi) => s+roundGauge[pi][r], 0) / players.length;
       markerPcts.push(avg);
@@ -2605,11 +2745,14 @@ function playFinishGaugeScene(winnerName, onComplete) {
     // 달리기 중지 → 모두 현재 프레임 고정
     runIntervals.forEach(iv => { if (iv) clearInterval(iv); });
 
-    // 1등 꺄륵 포즈
+    // 1등(공동우승 포함) 꺄륵 포즈
     players.forEach((pl, pi) => {
       if (pl.isFirst && STREAMERS[pl.sname]) {
         let cf = 0;
         runnerImgs[pi].src = buildUrl(pl.sname, "A05", cf, "E09");
+        // 골인 위치로 이동
+        runnerDivs[pi].style.left = "100%";
+        fillDivs[pi].style.width = "100%";
         const ci = setInterval(() => {
           cf = (cf+1) % 2;
           runnerImgs[pi].src = buildUrl(pl.sname, "A05", cf, "E09");
@@ -2690,7 +2833,7 @@ function triggerFinish() {
 
       // ③ 우승자 공개
       document.getElementById("celebWinner").textContent = currentFirstName || "";
-      startCelebAnim(currentFirstName);
+      startCelebAnim(currentWinners.length > 0 ? currentWinners : [currentFirstName]);
       document.getElementById("celebOverlay").classList.add("active");
       spawnFlyingChars();
       spawnBurst();
@@ -2717,8 +2860,21 @@ function spawnFlyingChars() {
   const targets = [];
   for (let i = 1; i <= 10; i++) {
     const el = document.getElementById("avatar_" + i);
-    if (el) targets.push(el);
+    if (el) {
+      // 1등(공동우승 포함)은 강강수월래에서 제외
+      const sname = el.dataset.sname || "";
+      if (currentWinners.includes(sname)) continue;
+      targets.push(el);
+    }
   }
+  // avatar_0도 제외 (1등이므로)
+  // 단, avatar_0의 sname이 currentWinners에 없을 경우에만 포함 (공동우승 아닌 경우)
+  const av0 = document.getElementById("avatar_0");
+  if (av0) {
+    const sname0 = av0.dataset.sname || "";
+    if (!currentWinners.includes(sname0)) targets.push(av0);
+  }
+
   const count = targets.length;
   if (count === 0) return;
 
@@ -2896,6 +3052,8 @@ function render(data) {
 
   prevJSON = json;
   currentFirstName = data[0]["🎙️스트리머"] || "";
+  // 공동 1등 목록
+  currentWinners = data.filter(r => Number(r["📝최종 점수"]) === Number(data[0]["📝최종 점수"])).map(r => r["🎙️스트리머"] || "");
 
   const _allScores = data.map(r => Number(r["📝최종 점수"]) || 0);
   const maxScore = Math.max(..._allScores);
