@@ -221,6 +221,93 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   animation: r3Sizzle 2.5s ease-in-out infinite !important;
 }
 #r5badge.r3-header-done .r-label { color: #ff5050; text-shadow: 0 0 8px rgba(255,50,50,0.6); }
+
+/* ── 5라운드 1등 전용 초화려 이펙트 ── */
+@keyframes r5FirstFlyIn {
+  0%   { transform: translateX(80px) scale(2) translateZ(0); opacity: 0; }
+  40%  { transform: translateX(-6px) scale(0.9) translateZ(0); opacity: 1; }
+  60%  { transform: translateX(4px) scale(1.08) translateZ(0); }
+  80%  { transform: translateX(-2px) scale(0.98) translateZ(0); }
+  100% { transform: translateX(0) scale(1) translateZ(0); opacity: 1; }
+}
+@keyframes r5FirstGoldPulse {
+  0%,100% {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px 3px rgba(255,215,0,0.8), 0 0 25px 8px rgba(255,165,0,0.5), 0 0 50px 15px rgba(255,100,0,0.3);
+  }
+  50% {
+    border-color: #fff7a0;
+    box-shadow: 0 0 20px 6px rgba(255,240,100,1), 0 0 45px 15px rgba(255,200,0,0.8), 0 0 80px 25px rgba(255,130,0,0.5);
+  }
+}
+@keyframes r5FirstTextShine {
+  0%,100% { color: #ffd700; text-shadow: 0 0 8px rgba(255,220,0,0.8), 0 0 20px rgba(255,170,0,0.5); }
+  50%     { color: #fff7a0; text-shadow: 0 0 16px rgba(255,255,150,1), 0 0 35px rgba(255,200,0,0.8), 0 0 60px rgba(255,150,0,0.4); }
+}
+@keyframes r5FirstBgFlash {
+  0%   { background: rgba(255,220,0,0.7); box-shadow: inset 0 0 20px rgba(255,200,0,0.6); }
+  40%  { background: rgba(200,150,0,0.4); box-shadow: inset 0 0 12px rgba(255,180,0,0.3); }
+  100% { background: rgba(80,50,0,0.0); box-shadow: none; opacity: 0; }
+}
+@keyframes r5CrownSpin {
+  0%   { transform: translateX(-50%) rotate(-20deg) scale(0); opacity: 0; }
+  50%  { transform: translateX(-50%) rotate(10deg) scale(1.3); opacity: 1; }
+  75%  { transform: translateX(-50%) rotate(-5deg) scale(1.05); }
+  100% { transform: translateX(-50%) rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes crownParticle {
+  0%   { transform: translate(-50%,-50%) scale(0) rotate(0deg); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(360deg); opacity: 0; }
+}
+
+/* impact 단계: 날아들어오면서 황금 폭발 */
+.rs-badge.rs-r5-first.r5-first-impact {
+  animation: r5FirstFlyIn 0.55s cubic-bezier(0.22,1,0.36,1) forwards;
+  border-color: #ffd700;
+  will-change: transform, opacity;
+  overflow: hidden;
+}
+.rs-badge.rs-r5-first.r5-first-impact::after {
+  content: '';
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  animation: r5FirstBgFlash 0.8s ease forwards;
+  opacity: 1;
+}
+/* 왕관 아이콘 띄우기 */
+.rs-badge.rs-r5-first.r5-first-impact::before {
+  content: '👑';
+  position: absolute; top: -22px; left: 50%;
+  font-size: 18px; line-height: 1;
+  transform: translateX(-50%) scale(0);
+  animation: r5CrownSpin 0.5s 0.15s cubic-bezier(0.34,1.6,0.64,1) both;
+  z-index: 10; pointer-events: none;
+}
+
+/* done 단계: 계속 황금빛으로 살아 숨쉬기 */
+.rs-badge.rs-r5-first.r5-first-done {
+  border-width: 2px;
+  animation: r5FirstGoldPulse 1.8s ease-in-out infinite;
+  background: rgba(60,40,0,0.55);
+}
+.rs-badge.rs-r5-first.r5-first-done::before {
+  content: '👑';
+  position: absolute; top: -18px; left: 50%;
+  font-size: 16px; line-height: 1;
+  transform: translateX(-50%);
+  z-index: 10; pointer-events: none;
+  animation: bounce 0.9s ease infinite alternate;
+}
+.rs-badge.rs-r5-first.r5-first-done .rs-r {
+  color: #ffc400;
+  text-shadow: 0 0 6px rgba(255,200,0,0.6);
+}
+.rs-badge.rs-r5-first.r5-first-done .rs-v {
+  animation: r5FirstTextShine 1.8s ease-in-out infinite;
+}
 .track-wrap { position: relative; height: 18px; overflow: visible; }
 .track-bg {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -1699,22 +1786,67 @@ function typeLength(chars, interval) { return chars * interval; }
 
 
 function revealR5Badges() {
-  // 각 플레이어 뱃지 — 순차 등장 (DOM 조작 없음, CSS만)
   const badges = document.querySelectorAll(".rs-badge.rs-r5");
+  // 공개 시점에 실제로 점수가 들어온 배지들 중 max 계산
+  const scores = Array.from(badges).map(el => {
+    const v = (el.dataset.score || "").trim();
+    return (v !== "" && v !== "-" && !isNaN(Number(v))) ? Number(v) : null;
+  });
+  const validScores = scores.filter(v => v !== null);
+  const maxScore5 = validScores.length ? Math.max(...validScores) : null;
+
   badges.forEach((el, i) => {
-    el.classList.remove("r3-impact", "r3-done");
+    const scoreVal = scores[i];
+    // 실제 점수가 있고(0포함) maxScore5랑 일치할 때만 1등 이펙트
+    const isFirst = maxScore5 !== null && scoreVal !== null && scoreVal === maxScore5;
+    if (isFirst) el.classList.add("rs-r5-first");
+    else el.classList.remove("rs-r5-first");
+    el.classList.remove("r3-impact", "r3-done", "r5-first-impact", "r5-first-done");
     el.style.display = "";
     el.style.opacity = "0";
     setTimeout(() => {
       el.style.opacity = "";
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        el.classList.add("r3-impact");
-        setTimeout(() => {
-          el.classList.remove("r3-impact");
-          el.classList.add("r3-done");
-        }, 750);
+        if (isFirst) {
+          el.classList.add("r3-impact");
+          setTimeout(() => {
+            el.classList.remove("r3-impact");
+            el.classList.add("r5-first-impact");
+            setTimeout(() => {
+              el.classList.remove("r5-first-impact");
+              el.classList.add("r5-first-done");
+              spawnCrownParticles(el);
+            }, 600);
+          }, 750);
+        } else {
+          el.classList.add("r3-impact");
+          setTimeout(() => {
+            el.classList.remove("r3-impact");
+            el.classList.add("r3-done");
+          }, 750);
+        }
       }));
     }, i * 110);
+  });
+}
+
+function spawnCrownParticles(badgeEl) {
+  const rect = badgeEl.getBoundingClientRect();
+  const panelRect = document.querySelector(".panel").getBoundingClientRect();
+  const cx = rect.left - panelRect.left + rect.width / 2;
+  const cy = rect.top - panelRect.top + rect.height / 2;
+  const panel = document.querySelector(".panel");
+  const emojis = ["👑","✨","⭐","🌟","💛","👑","✨","🌟"];
+  emojis.forEach((em, idx) => {
+    const span = document.createElement("div");
+    span.textContent = em;
+    const angle = (idx / emojis.length) * Math.PI * 2;
+    const dist = 55 + Math.random() * 35;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist - 20;
+    span.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:${14 + Math.random()*10}px;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) scale(0);animation:crownParticle 1.1s ${idx*60}ms cubic-bezier(0.22,1,0.36,1) forwards;--tx:${tx}px;--ty:${ty}px;`;
+    panel.appendChild(span);
+    setTimeout(() => span.remove(), 1800);
   });
 }
 
@@ -1722,7 +1854,7 @@ function revealR5Badges() {
 function hideR5Badges() {
   document.querySelectorAll(".rs-badge.rs-r5").forEach(el => {
     el.style.display = "none";
-    el.classList.remove("r3-impact", "r3-done", "locked", "decoding", "decoded");
+    el.classList.remove("r3-impact", "r3-done", "r5-first-impact", "r5-first-done", "locked", "decoding", "decoded");
   });
 }
 
@@ -2089,9 +2221,14 @@ function render(data) {
 
   // 각 라운드 최고점 계산
   function getRoundMax(key) {
-    const vals = data.map(r => Number(r[key])||0);
-    const mx = Math.max(...vals);
-    return mx > 0 ? mx : null;
+    const vals = data.map(r => {
+      const v = r[key];
+      if (v === undefined || v === null || v === "" || v === "-") return null;
+      const n = Number(v);
+      return isNaN(n) ? null : n;
+    }).filter(v => v !== null);
+    if (!vals.length) return null;
+    return Math.max(...vals);
   }
   const max1 = getRoundMax("👑1라운드");
   const max2 = getRoundMax("👑2라운드");
@@ -2118,23 +2255,22 @@ function render(data) {
     const _r3 = row["👑3라운드"]; const s3 = (_r3 !== undefined && _r3 !== null && _r3 !== "") ? String(_r3) : "-";
     const _r4 = row["👑4라운드"]; const s4 = (_r4 !== undefined && _r4 !== null && _r4 !== "") ? String(_r4) : "-";
     const _r5 = row["👑5라운드"]; const s5 = (_r5 !== undefined && _r5 !== null && _r5 !== "") ? String(_r5) : "-";
-    // 라운드 점수가 하나라도 실제로 기록됐는지 (0점 포함, 빈셀/- 제외)
     const hasAnyScore = [s1, s2, s3, s4, s5].some(s => s !== "-");
-    const e1 = max1 && Number(s1)===max1 ? '👑' : '🚩';
-    const e2 = max2 && Number(s2)===max2 ? '👑' : '🚩';
-    const e3 = max3 && Number(s3)===max3 ? '👑' : '🚩';
-    const e4 = max4 && Number(s4)===max4 ? '👑' : '🚩';
-    const e5 = max5 && Number(s5)===max5 ? '👑' : '🏁';
+    const e1 = (max1 !== null && s1 !== "-" && Number(s1)===max1) ? '👑' : '🚩';
+    const e2 = (max2 !== null && s2 !== "-" && Number(s2)===max2) ? '👑' : '🚩';
+    const e3 = (max3 !== null && s3 !== "-" && Number(s3)===max3) ? '👑' : '🚩';
+    const e4 = (max4 !== null && s4 !== "-" && Number(s4)===max4) ? '👑' : '🚩';
+    const e5 = (max5 !== null && s5 !== "-" && Number(s5)===max5) ? '👑' : '🏁';
     const pct = maxScore > 0 ? Math.min(93, Math.max(5, (total/maxScore)*88)) : 5;
     const rankFillClass  = rankFillClasses[Math.min(rank-1, 6)];
     const rankBadgeClass = rankBadgeClasses[Math.min(rank-1, 6)];
     const div = document.createElement("div");
     div.className = "race-row";
-    const t1 = max1 && Number(s1)===max1 ? ' rs-top' : '';
-    const t2 = max2 && Number(s2)===max2 ? ' rs-top' : '';
-    const t3 = max3 && Number(s3)===max3 ? ' rs-top' : '';
-    const t4 = max4 && Number(s4)===max4 ? ' rs-top' : '';
-    const t5 = max5 && Number(s5)===max5 ? ' rs-top' : '';
+    const t1 = (max1 !== null && s1 !== "-" && Number(s1)===max1) ? ' rs-top' : '';
+    const t2 = (max2 !== null && s2 !== "-" && Number(s2)===max2) ? ' rs-top' : '';
+    const t3 = (max3 !== null && s3 !== "-" && Number(s3)===max3) ? ' rs-top' : '';
+    const t4 = (max4 !== null && s4 !== "-" && Number(s4)===max4) ? ' rs-top' : '';
+    const t5 = (max5 !== null && s5 !== "-" && Number(s5)===max5) ? ' rs-top' : '';
     div.innerHTML =
       '<div class="race-top">'+
         '<div class="rank-badge '+rankBadgeClass+'">'+rank+'</div>'+
@@ -2148,7 +2284,11 @@ function render(data) {
           '<div class="rs-badge'+t2+'"><div class="rs-r">'+e2+'2라운드</div><div class="rs-v">'+s2+'</div></div>'+
           '<div class="rs-badge'+t3+'"><div class="rs-r">'+e3+'3라운드</div><div class="rs-v">'+s3+'</div></div>'+
           '<div class="rs-badge'+t4+'"><div class="rs-r">'+e4+'4라운드</div><div class="rs-v">'+s4+'</div></div>'+
-          '<div class="rs-badge rs-r5'+t5+(round5Revealed ? ' r3-done' : '')+'" style="'+(round5Revealed ? '' : 'display:none')+'"><div class="rs-r">'+e5+'5라운드</div><div class="rs-v">'+s5+'</div></div>'+
+          (function(){
+            const _isTop5 = max5 && Number(s5)===max5;
+            const _doneClass = round5Revealed ? (_isTop5 ? ' r5-first-done' : ' r3-done') : '';
+            return '<div class="rs-badge rs-r5'+(_isTop5 ? ' rs-r5-first' : '')+_doneClass+'" data-score="'+s5+'" style="'+(round5Revealed ? '' : 'display:none')+'"><div class="rs-r">'+e5+'5라운드</div><div class="rs-v">'+s5+'</div></div>';
+          })()+
         '</div>'+
       '</div>'+
       '<div class="track-wrap">'+
