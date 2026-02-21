@@ -358,10 +358,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 
 /* 1등 러너 아이콘 빨강 후광 */
-@keyframes firstRunnerAura {
-  0%,100% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 4px rgba(255,0,0,0.6)); }
-  50%     { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 9px rgba(255,80,80,0.9)) drop-shadow(0 0 18px rgba(255,0,0,0.5)); }
-}
+
 
 /* 완주 시 게이지 섬광 스윕 */
 @keyframes gaugeFlashSweep {
@@ -380,10 +377,6 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   animation: trackBgFlash 0.55s ease-in-out infinite;
 }
 
-/* 1등 runner 아이콘 빨강 후광 (is-first 클래스 이용) */
-.runner-icon.is-first.finish-runner img {
-  animation: firstRunnerAura 1.5s ease-in-out infinite !important;
-}
 
 /* 완주 시 트랙 wrap 전체 글로우 - 제거 */
 .track-wrap.finish-active {
@@ -408,10 +401,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .runner-icon.finish-runner {
   left: calc(100% - 13px) !important;
 }
-/* finish-runner일 때 firstRunnerAura 오버라이드 */
-.runner-icon.is-first.finish-runner img {
-  animation: firstRunnerAura 1.5s ease-in-out infinite !important;
-}
+
 .runner-icon.is-first::after {
   content: '⭐'; position: absolute; top: -8px; left: 50%;
   transform: translateX(-50%); font-size: 7px;
@@ -419,6 +409,12 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 /* 골인(finish-runner)시엔 👑으로 교체 + 크게 */
 .runner-icon.is-first.finish-runner::after {
+  content: '👑';
+  font-size: 13px;
+  top: -14px;
+}
+/* 종료 후 crowned 상태: 별→왕관 */
+.runner-icon.is-first.crowned::after {
   content: '👑';
   font-size: 13px;
   top: -14px;
@@ -2382,7 +2378,7 @@ function clearFinishEffects() {
   });
   document.querySelectorAll(".track-wrap").forEach(el => el.classList.remove("finish-active"));
   document.querySelectorAll(".runner-icon").forEach(el => {
-    el.classList.remove("frozen", "finish-runner");
+    el.classList.remove("frozen", "finish-runner", "crowned");
     el.style.opacity = "";
   });
   document.querySelectorAll(".avatar-img").forEach(el => el.classList.remove("frozen"));
@@ -2817,6 +2813,7 @@ function playFinishGaugeScene(winnerName, onComplete) {
 
 function triggerFinish() {
   if (celebActive) {
+    const celebWasShowing = document.getElementById("celebOverlay").classList.contains("active");
     celebActive = false;
     clearInterval(window._celebInterval);
     clearTimeout(celebTimer);
@@ -2828,6 +2825,17 @@ function triggerFinish() {
     document.querySelectorAll(".particle").forEach(p => p.remove());
     document.querySelectorAll(".rs-badge").forEach(el => el.style.animationPlayState = "");
     clearFinishEffects();
+    // 우승자 컷씬(강강수월래)이 떠있던 상태에서 종료 → 1등 골인+왕관
+    if (celebWasShowing) {
+      document.querySelectorAll(".runner-icon.is-first").forEach(el => {
+        el.classList.add("finish-runner", "crowned");
+        el.style.left = "";
+      });
+      document.querySelectorAll(".track-fill.fill-1").forEach(el => {
+        el.classList.add("finish-glow");
+        el.style.width = "100%";
+      });
+    }
     return;
   }
 
