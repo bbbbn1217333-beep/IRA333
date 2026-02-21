@@ -1014,7 +1014,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 /* ── 글자별 불꽃 소환 이펙트 ── */
 .cs-char-wrap {
   display: inline-flex; align-items: flex-end; justify-content: center;
-  gap: 2px; flex-wrap: nowrap;
+  gap: 6px; flex-wrap: nowrap;
 }
 
 .cs-char {
@@ -1576,7 +1576,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
     <div id="drumrollFlash"></div>
     <div id="drumrollText">
       <div id="drumrollQmark">🏆</div>
-      <div id="drumrollLabel">우 승 자 는 . . .</div>
+      <div id="drumrollLabel">최 후 의 승 자</div>
     </div>
     <div id="drumrollBar"><div id="drumrollBarFill"></div></div>
   </div>
@@ -1733,13 +1733,13 @@ function startCelebAnim(winners) {
     // 공동 우승!!! 타이틀 (캐릭터 아래)
     const titleEl = document.createElement("div");
     titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);position:absolute;bottom:calc(6% + 1.4em);left:0;right:0;z-index:5;";
-    titleEl.textContent = "🏆 공동 우승!!! 🏆";
+    titleEl.textContent = "🏆 공동 우승 🏆";
     charBox.appendChild(titleEl);
 
     // 스트리머명 (타이틀 바로 아래)
     const nameEl = document.createElement("div");
     nameEl.className = "celeb-co-name";
-    nameEl.textContent = winners.join(", ");
+    nameEl.textContent = winners.join(" × ");
     charBox.appendChild(nameEl);
 
     coWrap.appendChild(charBox);
@@ -2104,7 +2104,7 @@ function playCutscene(onComplete) {
       { text: "라",  type: "fire"  },
       { text: "운",  type: "fire"  },
       { text: "드",  type: "fire"  },
-      { text: " ",   type: "white" },
+      { text: "  ",  type: "white" },
       { text: "공",  type: "fire"  },
       { text: "개",  type: "fire"  },
       { text: "🫷🏻", type: "white" },
@@ -2382,11 +2382,7 @@ function clearFinishEffects() {
   });
   document.querySelectorAll(".track-wrap").forEach(el => el.classList.remove("finish-active"));
   document.querySelectorAll(".runner-icon").forEach(el => {
-    el.classList.remove("frozen");
-    // 1등 러너는 골인 위치 유지 (finish-runner 클래스 및 위치 그대로)
-    if (!el.classList.contains("is-first")) {
-      el.classList.remove("finish-runner");
-    }
+    el.classList.remove("frozen", "finish-runner");
     el.style.opacity = "";
   });
   document.querySelectorAll(".avatar-img").forEach(el => el.classList.remove("frozen"));
@@ -2574,11 +2570,11 @@ function playFinishGaugeScene(winnerName, onComplete) {
     nameSpan.textContent = pl.sname;
     nameSpan.style.cssText =
       `font-size:12px;font-weight:900;`+
-      `color:${pl.isFirst?"#ffd700":"#ffb3b3"};`+
+      `color:${pl.isFirst?"#ffffff":"#ffb3b3"};`+
       `width:${NAME_W}px;flex-shrink:0;text-align:right;white-space:nowrap;`+
       `overflow:hidden;text-overflow:ellipsis;`+
       `font-family:'Pretendard','Noto Sans KR',sans-serif;`+
-      `text-shadow:${pl.isFirst?"0 0 8px rgba(255,200,0,0.7)":"1px 1px 0 rgba(0,0,0,0.8)"};`;
+      `text-shadow:${pl.isFirst?"-1px -1px 0 rgba(255,120,120,0.3), 1px -1px 0 rgba(255,120,120,0.3), -1px 1px 0 rgba(255,120,120,0.3), 1px 1px 0 rgba(255,120,120,0.3), 0 0 12px rgba(255,50,50,0.7), 0 0 28px rgba(200,0,0,0.4)":"1px 1px 0 rgba(0,0,0,0.8)"};`;
 
     const trackWrap = document.createElement("div");
     trackWrap.style.cssText = "position:relative;flex:1;height:100%;overflow:visible;";
@@ -3161,7 +3157,7 @@ function render(data) {
           '<div class="track-fill '+rankFillClass+'" style="width:'+pct+'%"></div>'+
           '<div class="finish-line"></div>'+
         '</div>'+
-        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%;'+(rank===1 && pct>=90 ? 'transform:translate('+(-50-(pct-90)/10*50)+'%,-100%)' : '')+'">'+
+        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%">'+
           '<img id="runner_'+i+'" src="" alt="">'+
         '</div>'+
       '</div>';
