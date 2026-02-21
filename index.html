@@ -72,12 +72,13 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   width: 24px; height: 24px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 900; flex-shrink: 0; border: 2px solid;
+  margin-top: 6px;
 }
 .rank-1 { background: radial-gradient(circle, #ff4747, #c70000); color: #fff; border-color: #ff6060; box-shadow: 0 0 8px rgba(255,50,50,0.6); }
 .rank-2 { background: radial-gradient(circle, #d0d8e0, #7a8a99); color: #1a2030; border-color: #b0bec5; }
 .rank-3 { background: radial-gradient(circle, #f0a070, #a04010); color: #2a0800; border-color: #cd7f32; }
 .rank-other { background: rgba(0,0,0,0.4); color: #e8b0b0; border-color: #5a2020; }
-.avatar-wrap { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
+.avatar-wrap { position: relative; width: 40px; height: 40px; flex-shrink: 0; align-self: center; }
 .avatar-img {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scaleX(-1);
   width: 250px; height: 250px; object-fit: contain;
@@ -85,7 +86,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
   z-index: 2;
 }
-.name-score { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; }
+.name-score { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; margin-top: 6px; }
 .score-total + .score-label { margin-left: 0; }
 .streamer-name {
   font-size: 16px; font-weight: 900; color: #ffb3b3;
@@ -308,7 +309,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 .rs-badge.rs-r5-first.r5-first-done .rs-v {
   animation: r5FirstTextShine 1.8s ease-in-out infinite;
 }
-.track-wrap { position: relative; height: 18px; overflow: visible; }
+.track-wrap { position: relative; height: 18px; overflow: visible; margin-top: 9px; }
 .track-bg {
   position: absolute; top: 50%; transform: translateY(-50%);
   left: 0; right: 0; height: 9px;
@@ -420,6 +421,16 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   top: -14px;
 }
 @keyframes bounce { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-3px); } }
+@keyframes ghostFloat {
+  0%   { transform: translateX(-50%) scaleX(-1) translateY(0px); }
+  50%  { transform: translateX(-50%) scaleX(-1) translateY(-14px); }
+  100% { transform: translateX(-50%) scaleX(-1) translateY(0px); }
+}
+@keyframes ghostFloatR {
+  0%   { transform: translateX(-50%) scaleX(1) translateY(0px); }
+  50%  { transform: translateX(-50%) scaleX(1) translateY(-14px); }
+  100% { transform: translateX(-50%) scaleX(1) translateY(0px); }
+}
 
 .avatar-img.frozen { opacity: 0.45; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)) grayscale(0.6); }
 .runner-icon.frozen img { opacity: 0.4; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) grayscale(0.6); }
@@ -649,6 +660,16 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
   padding: 0;
   position: relative;
 }
+/* 6명 이상 공동우승 시 박스만 확장 */
+.celeb-co-charbox.many-winners {
+  width: min(700px, 95%);
+  aspect-ratio: 1 / 1;
+}
+.celeb-co-charbox.many-winners .celeb-co-chars-row {
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-60%);
+}
 .celeb-co-chars-row {
   display: flex;
   flex-direction: row;
@@ -697,12 +718,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.8); } }
 .live-text { font-size: 11px; color: #ff4040; font-weight: 900; letter-spacing: 2px; }
 .empty { padding: 14px; text-align: center; color: #6b0000; font-size: 12px; }
-#bgCrackCanvas {
-  position: absolute; inset: 0; z-index: 0;
-  pointer-events: none; border-radius: 10px;
-  opacity: 0; transition: opacity 1.2s ease;
-}
-#bgCrackCanvas.visible { opacity: 1; }
+
 
 /* ==============================
    완주 게이지 풀샷 컷씬
@@ -1465,7 +1481,6 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 <div class="scale-wrapper">
 <div class="panel-wrap">
 <div class="panel" id="panel">
-  <canvas id="bgCrackCanvas"></canvas>
   <div id="finishGaugeOverlay">
     <div id="fgoInner">
       <div id="fgoEventTitle">
@@ -1703,6 +1718,9 @@ function startCelebAnim(winners) {
     // 캐릭터들 담는 박스
     const charBox = document.createElement("div");
     charBox.className = "celeb-co-charbox";
+    if (winners.length >= 6) {
+      charBox.classList.add("many-winners");
+    }
 
     // 캐릭터들 가로 배치 (먼저)
     const charsRow = document.createElement("div");
@@ -1728,14 +1746,35 @@ function startCelebAnim(winners) {
 
     // 공동 우승!!! 타이틀 (캐릭터 아래)
     const titleEl = document.createElement("div");
-    titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);position:absolute;bottom:calc(6% + 1.4em);left:0;right:0;z-index:5;";
+    const textBottomBase = (winners.length >= 2 && winners.length <= 4) ? "18%" : (winners.length === 5 ? "14%" : (winners.length >= 6 ? "28%" : "6%"));
+    const titleGap = (winners.length >= 6) ? "1.5em" : "2.2em";
+    titleEl.style.cssText = "font-size:clamp(16px,3.5vw,26px);font-weight:800;color:#fff;letter-spacing:3px;text-align:center;white-space:nowrap;text-shadow:0 0 2px rgba(255,255,255,1),0 0 10px rgba(255,120,120,0.9),0 0 24px rgba(255,50,50,0.7),2px 2px 0 rgba(0,0,0,0.8);position:absolute;bottom:calc(" + textBottomBase + " + " + titleGap + ");left:0;right:0;z-index:5;";
     titleEl.textContent = "🏆 공동 우승 🏆";
     charBox.appendChild(titleEl);
 
     // 스트리머명 (타이틀 바로 아래)
     const nameEl = document.createElement("div");
     nameEl.className = "celeb-co-name";
-    nameEl.textContent = winners.join(" × ");
+    if (winners.length >= 2 && winners.length <= 4) {
+      nameEl.style.bottom = "18%";
+    } else if (winners.length === 5) {
+      nameEl.style.bottom = "19%";
+    } else if (winners.length >= 6) {
+      nameEl.style.bottom = "28%";
+    }
+    if (winners.length >= 6) {
+      nameEl.textContent = winners.join(" × ");
+      nameEl.style.fontSize = "clamp(12px, 2.2vw, 19px)";
+      nameEl.style.fontWeight = "900";
+      nameEl.style.whiteSpace = "nowrap";
+    } else if (winners.length === 5) {
+      nameEl.textContent = winners.join(" × ");
+      nameEl.style.fontSize = "clamp(12px, 2.5vw, 20px)";
+      nameEl.style.fontWeight = "900";
+      nameEl.style.whiteSpace = "nowrap";
+    } else {
+      nameEl.textContent = winners.join(" × ");
+    }
     charBox.appendChild(nameEl);
 
     coWrap.appendChild(charBox);
@@ -2355,8 +2394,21 @@ function applyFinishEffects(winnerName) {
         el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
         startAvatarAnim(el, sname, 1, 0, true);
       } else {
+        // 2등~7등: frozen 해제 후 유령 날기(A40) + 울음(E03) 애니메이션
+        el.classList.remove("frozen");
         el.style.opacity = "1";
         el.style.filter = "drop-shadow(0 1px 4px rgba(0,0,0,0.6))";
+        if (sname && STREAMERS[sname]) {
+          // 기존 애니 정리
+          if (activeAnims[sname]) { clearInterval(activeAnims[sname]); delete activeAnims[sname]; }
+          let ghostFrame = 0;
+          el.src = buildUrl(sname, "A40", ghostFrame, "E03");
+          ghostFrame = (ghostFrame + 1) % 4;
+          activeAnims[sname] = setInterval(() => {
+            el.src = buildUrl(sname, "A40", ghostFrame, "E03");
+            ghostFrame = (ghostFrame + 1) % 4;
+          }, 300);
+        }
       }
     });
 
@@ -2904,95 +2956,90 @@ function spawnFlyingChars() {
   const count = targets.length;
   if (count === 0) return;
 
-  const cx = overlayW / 2;
-  const cy = overlayH / 2;
-  const radius = Math.min(overlayW, overlayH) * 0.32; // 공전 반지름
-  const CHAR_SIZE = 360;
-  const ORBIT_MS  = 5500;  // 공전 시간 느리게
-  const STAY_EXTRA = 1200;  // 다 모인 후 잠깐 더 도는 시간
   const orbitImgs = [];
 
-  targets.forEach((avatarEl, idx) => {
-    const sname = avatarEl.dataset.sname || "";
-    const angleOffset = (idx / count) * Math.PI * 2; // 균등 배치
+  function placeChars() {
+    const celebBox = document.getElementById("celebBox");
+    // offsetLeft/Top은 스케일 영향 없이 CSS 레이아웃 기준값
+    const boxLeft = celebBox ? celebBox.offsetLeft : 0;
+    const boxTop  = celebBox ? celebBox.offsetTop  : 0;
+    const boxW    = celebBox ? celebBox.offsetWidth  : (overlay.offsetWidth  || 630);
+    const boxH    = celebBox ? celebBox.offsetHeight : (overlay.offsetHeight || 400);
 
-    const img = document.createElement("img");
-    img.dataset.angle = angleOffset;
-    img.dataset.sname = sname;
-    const src = sname && STREAMERS[sname]
-      ? buildUrl(sname, "A40", 0, "E03")  // 꼴등 포즈
-      : avatarEl.src;
-    img.src = src;
+    // boxLeft/Top이 0이고 transform: translate(-50%,-50%)라서
+    // celebBox는 overlay 중앙에 위치 → 실제 박스 좌상단 계산
+    const actualLeft = (overlay.offsetWidth  - boxW) / 2;
+    const actualTop  = (overlay.offsetHeight - boxH) / 2;
 
-    img.style.cssText =
-      "position:absolute;" +
-      "width:" + CHAR_SIZE + "px;height:" + CHAR_SIZE + "px;" +
-      "object-fit:contain;" +
-      "pointer-events:none;z-index:10002;" +
-      "opacity:0;" +
-      "transform:translate(-50%,-50%) scaleX(-1);" +
-      "transition:opacity 0.3s ease;";
-    overlay.appendChild(img);
-    orbitImgs.push(img);
+    // 캐릭터 크기 고정, 간격은 크게 음수로 겹쳐서 밀집
+    const CHAR_SIZE = 180;
+    const GAP = -120; // 많이 겹쳐서 밀집
+    const totalRowW = count * CHAR_SIZE + (count - 1) * GAP;
+    // 박스 중앙 정렬
+    const rowStartX = actualLeft + boxW / 2 - totalRowW / 2;
+    const topPx = actualTop - 30; // ← 이 숫자로 위아래 위치 조정 (음수일수록 위로)
 
-    // 순차 등장
-    setTimeout(() => { img.style.opacity = "1"; }, idx * 150);
-  });
+    const ghostTimers = []; // 프레임 타이머 저장 (제거 시 클리어용)
 
-  // ── 공전 루프 ──
-  const startTime = performance.now();
-  let orbitRunning = true;
-  const BASE_SPEED = (Math.PI * 2) / (ORBIT_MS); // 1바퀴/ORBIT_MS
+    targets.forEach((avatarEl, idx) => {
+      const sname = avatarEl.dataset.sname || "";
 
-  function orbitStep(now) {
-    if (!orbitRunning) return;
-    const elapsed = now - startTime;
-    // 처음엔 느리게, 점점 살짝 빨라지는 느낌
-    const speedMult = Math.min(1 + elapsed / 4000, 1.5);
-    const angle = elapsed * BASE_SPEED * speedMult;
+      const img = document.createElement("img");
+      img.dataset.sname = sname;
+      // 날기(A40) + 울음(E03) 프레임 0부터 시작
+      img.src = sname && STREAMERS[sname] ? buildUrl(sname, "A40", 0, "E03") : avatarEl.src;
 
-    orbitImgs.forEach((img, idx) => {
-      const a = angle + (idx / count) * Math.PI * 2;
-      const x = cx + Math.cos(a) * radius;
-      const y = cy + Math.sin(a) * radius * 0.55; // 타원형 (위아래 납작)
-      img.style.left = x + "px";
-      img.style.top  = y + "px";
-      // 오른쪽 절반은 뒤집기 (달리는 방향 전환)
-      const facingRight = Math.cos(a) > 0;
-      img.style.transform = "translate(-50%,-50%) scaleX(" + (facingRight ? 1 : -1) + ")";
+      const slotCenter = rowStartX + idx * (CHAR_SIZE + GAP) + CHAR_SIZE / 2;
+
+      // 각 캐릭터마다 살짝 다른 타이밍으로 둥실둥실
+      const floatDelay = (idx * 0.18).toFixed(2);
+      const floatDur   = (1.6 + idx * 0.07).toFixed(2);
+
+      img.style.cssText =
+        "position:absolute;" +
+        "width:" + CHAR_SIZE + "px;height:" + CHAR_SIZE + "px;" +
+        "object-fit:contain;" +
+        "pointer-events:none;z-index:10002;" +
+        "opacity:0;" +
+        "left:" + slotCenter + "px;" +
+        "top:" + topPx + "px;" +
+        "transform:translateX(-50%) scaleX(-1);" +
+        "transition:opacity 0.5s ease;";
+      overlay.appendChild(img);
+      orbitImgs.push(img);
+
+      // 순차 등장 + 둥실 + 프레임 애니메이션(울음 날기)
+      setTimeout(() => {
+        img.style.opacity = "0.65";
+        img.style.transition = "opacity 0.5s ease";
+        img.style.animation = "ghostFloat " + floatDur + "s " + floatDelay + "s ease-in-out infinite";
+
+        // 날기(A40)+울음(E03) 4프레임 순환
+        if (sname && STREAMERS[sname]) {
+          let frame = 0;
+          const t = setInterval(() => {
+            frame = (frame + 1) % 4;
+            img.src = buildUrl(sname, "A40", frame, "E03");
+          }, 220 + idx * 15); // 캐릭터마다 속도 살짝 다르게
+          ghostTimers.push(t);
+        }
+      }, 80 + idx * 100);
     });
-    requestAnimationFrame(orbitStep);
+
+    // 14초 후 자동 제거
+    setTimeout(() => {
+      ghostTimers.forEach(t => clearInterval(t));
+      orbitImgs.forEach((img, idx) => {
+        setTimeout(() => {
+          img.style.opacity = "0";
+          setTimeout(() => img.remove(), 500);
+        }, idx * 60);
+      });
+    }, 14000);
   }
-  requestAnimationFrame(orbitStep);
 
-  // ── 공전 끝 → 원심력으로 튕겨나가기 ──
-  const totalOrbitMs = ORBIT_MS + STAY_EXTRA + targets.length * 150;
-  setTimeout(() => {
-    orbitRunning = false;
-
-    orbitImgs.forEach((img, idx) => {
-      // 현재 위치 기준 원심 방향으로 날아가기
-      const curLeft = parseFloat(img.style.left) || cx;
-      const curTop  = parseFloat(img.style.top)  || cy;
-      const dx = curLeft - cx;
-      const dy = curTop  - cy;
-      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-      const flyDist = 320 + rand(60, 140);
-      const fx = (dx / dist) * flyDist;
-      const fy = (dy / dist) * flyDist;
-      const fr = rand(-45, 45);
-      const fd = rand(0.7, 1.1);
-
-      img.style.transition = "none";
-      img.style.animation  =
-        "orbitFlyOut " + fd + "s " + (idx * 0.07) + "s cubic-bezier(0.4,0,1,1) both";
-      img.style.setProperty("--fx", fx + "px");
-      img.style.setProperty("--fy", fy + "px");
-      img.style.setProperty("--fr", fr + "deg");
-
-      setTimeout(() => img.remove(), (fd + idx * 0.07) * 1000 + 400);
-    });
-  }, totalOrbitMs);
+  // boxPop 애니메이션(0.5s) + 여유 후 배치
+  setTimeout(placeChars, 700);
 }
 
 function rand(min, max) { return Math.random() * (max - min) + min; }
@@ -3127,10 +3174,11 @@ function render(data) {
     const e3 = (max3 !== null && s3 !== "-" && Number(s3)===max3) ? '👑' : '🚩';
     const e4 = (max4 !== null && s4 !== "-" && Number(s4)===max4) ? '👑' : '🚩';
     const e5 = (max5 !== null && s5 !== "-" && Number(s5)===max5) ? '👑' : '🏁';
-    const _scoreRange = maxScore - minScore;
-    const pct = _scoreRange > 0
-      ? Math.min(93, Math.max(5, 5 + ((total - minScore) / _scoreRange) * 88))
-      : 5;
+    const pct = maxScore > 0
+      ? Math.min(100, (total / maxScore) * 100)
+      : 0;
+    // 캐릭터 아이콘이 트랙 양끝에서 화면 밖으로 나가지 않도록 위치 클램핑
+    const runnerPct = Math.min(96, Math.max(4, pct));
     const rankFillClass  = rankFillClasses[Math.min(rank-1, 6)];
     const rankBadgeClass = rankBadgeClasses[Math.min(rank-1, 6)];
     const div = document.createElement("div");
@@ -3165,7 +3213,7 @@ function render(data) {
           '<div class="track-fill '+rankFillClass+'" style="width:'+pct+'%"></div>'+
           '<div class="finish-line"></div>'+
         '</div>'+
-        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+pct+'%">'+
+        '<div class="runner-icon'+(rank===1?' is-first':'')+'" style="left:'+runnerPct+'%">'+
           '<img id="runner_'+i+'" src="" alt="">'+
         '</div>'+
       '</div>';
@@ -3176,7 +3224,7 @@ function render(data) {
     startAvatarAnim(document.getElementById("avatar_"+i), name, rank, total, hasAnyScore);
     startRunnerAnim(document.getElementById("runner_"+i), name);
   });
-  if (data.length >= 7 && typeof startBgCrackAnim === "function") startBgCrackAnim();
+  
 }
 
 async function fetchData() {
@@ -3192,434 +3240,6 @@ async function fetchData() {
 
 fetchData();
 setInterval(fetchData, 5000);
-
-// ── 배경 충돌 균열 애니메이션 ──────────────────────────────────
-(function () {
-  const canvas = document.getElementById("bgCrackCanvas");
-  const ctx    = canvas.getContext("2d");
-  let running  = false;
-  let raf      = null;
-  const cracks = [];
-
-  // 7명 색상
-  const COLORS = [
-    "#ff3300", // 빨강
-    "#ff9900", // 주황
-    "#ffdd00", // 노랑
-    "#44ff66", // 초록
-    "#44ccff", // 하늘
-    "#8844ff", // 보라
-    "#ff44bb", // 핑크
-  ];
-
-  function resize() {
-    const p = document.getElementById("panel");
-    canvas.width  = p.offsetWidth;
-    canvas.height = p.offsetHeight;
-  }
-
-  // 균열 생성
-  function genCrack(cx, cy) {
-    const arms = [];
-    const numArms = 3 + Math.floor(Math.random() * 5);
-    for (let i = 0; i < numArms; i++) {
-      const angle  = (Math.PI * 2 / numArms) * i + (Math.random() - 0.5) * 0.5;
-      const length = 40 + Math.random() * 130;
-      const pts    = [{x: cx, y: cy}];
-      let x = cx, y = cy, a = angle;
-      const n = 5 + Math.floor(Math.random() * 6);
-      for (let s = 0; s < n; s++) {
-        const kink = Math.random() < 0.18
-          ? (Math.random() - 0.5) * 0.8
-          : (Math.random() - 0.5) * 0.12;
-        a += kink;
-        const segLen = (length / n) * (0.85 + Math.random() * 0.3);
-        x += Math.cos(a) * segLen;
-        y += Math.sin(a) * segLen;
-        pts.push({x, y});
-        if (Math.random() < 0.28 && s > 1 && s < n - 1) {
-          const sa  = a + (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.5);
-          const sl  = length * (0.12 + Math.random() * 0.22);
-          const subPts = [{x, y}, {x: x + Math.cos(sa)*sl, y: y + Math.sin(sa)*sl}];
-          arms.push({ pts: subPts, sub: true, w: 0.5 + Math.random() * 0.5 });
-        }
-      }
-      arms.push({ pts, sub: false, w: 1.0 + Math.random() * 1.5 });
-    }
-    // 충격점 주변 콘크리트 파편 조각 (짧은 선분들)
-    const chips = [];
-    const chipCount = 3 + Math.floor(Math.random() * 5);
-    for (let i = 0; i < chipCount; i++) {
-      const ca  = Math.random() * Math.PI * 2;
-      const cr  = 3 + Math.random() * 9;
-      const cl  = 4 + Math.random() * 10;
-      const ca2 = ca + (Math.random() - 0.5) * 1.0;
-      chips.push({
-        x1: cx + Math.cos(ca)  * cr,
-        y1: cy + Math.sin(ca)  * cr,
-        x2: cx + Math.cos(ca2) * (cr + cl),
-        y2: cy + Math.sin(ca2) * (cr + cl),
-      });
-    }
-    return { cx, cy, arms, chips, alpha: 0, target: 0.6 + Math.random() * 0.35 };
-  }
-
-  function drawCrack(c) {
-    if (c.alpha <= 0) return;
-
-    for (const arm of c.arms) {
-      const pts = arm.pts;
-      if (pts.length < 2) continue;
-      const w = arm.w;
-      const a = c.alpha * (arm.sub ? 0.4 : 1);
-
-      // 굵은 배경색 계열 - 파인 느낌 (어두운 주황 반투명)
-      ctx.globalAlpha = a * 0.2;
-      ctx.strokeStyle = arm.sub ? "rgba(80,35,0,0.4)" : "rgba(110,50,0,0.45)";
-      ctx.lineWidth   = w * 2.8;
-      ctx.lineCap     = "round";
-      ctx.lineJoin    = "round";
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-      ctx.stroke();
-
-      // 가는 코어 - 연한 주황 균열선
-      ctx.globalAlpha = a * 0.35;
-      ctx.strokeStyle = arm.sub ? "rgba(255,160,60,0.45)" : "rgba(255,185,70,0.55)";
-      ctx.lineWidth   = w * 0.9;
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-      ctx.stroke();
-    }
-
-    // 파편 조각
-    if (c.chips) {
-      for (const ch of c.chips) {
-        ctx.globalAlpha = c.alpha * 0.4;
-        ctx.strokeStyle = "rgba(200,100,0,0.7)";
-        ctx.lineWidth   = 1.5;
-        ctx.lineCap     = "round";
-        ctx.beginPath(); ctx.moveTo(ch.x1, ch.y1); ctx.lineTo(ch.x2, ch.y2); ctx.stroke();
-      }
-    }
-
-    ctx.globalAlpha = 1;
-  }
-
-  // ── 충돌 이펙트: 피맛 + 콘크리트 파편 + 먼지 ──
-  const impactEffects = [];
-
-  function spawnImpactEffect(cx, cy, colors) {
-    const now = performance.now();
-
-    // ── 핏방울: 눈물 모양, 중력 받아 떨어짐 ──
-    const drops = [];
-    for (let i = 0; i < 28; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const spd   = 80 + Math.random() * 220;
-      const r     = 2 + Math.random() * 5;
-      drops.push({
-        x: cx, y: cy,
-        vx: Math.cos(angle) * spd,
-        vy: Math.sin(angle) * spd - 60, // 초반엔 위로 튀었다가
-        r,
-        life: 0.4 + Math.random() * 0.7,
-        trail: [],
-      });
-    }
-
-    // ── 핏줄기: 충돌점에서 방사형으로 뻗는 얇은 선 ──
-    const streaks = [];
-    for (let i = 0; i < 14; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const len   = 30 + Math.random() * 90;
-      const kink  = (Math.random() - 0.5) * 0.6; // 약간 꺾임
-      streaks.push({ angle, len, kink, life: 0.3 + Math.random() * 0.4 });
-    }
-
-    // ── 콘크리트 파편: 사각형 덩어리 ──
-    const chunks = [];
-    for (let i = 0; i < 18; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const spd   = 60 + Math.random() * 160;
-      chunks.push({
-        x: cx, y: cy,
-        vx: Math.cos(angle) * spd,
-        vy: Math.sin(angle) * spd - 40,
-        rot: Math.random() * Math.PI * 2,
-        rotV: (Math.random() - 0.5) * 18,
-        w: 4 + Math.random() * 10,
-        h: 3 + Math.random() * 7,
-        life: 0.5 + Math.random() * 0.6,
-      });
-    }
-
-    // ── 먼지 구름: 느리게 퍼지는 원들 ──
-    const dusts = [];
-    for (let i = 0; i < 10; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const spd   = 20 + Math.random() * 50;
-      dusts.push({
-        x: cx + (Math.random() - 0.5) * 20,
-        y: cy + (Math.random() - 0.5) * 20,
-        vx: Math.cos(angle) * spd,
-        vy: Math.sin(angle) * spd - 15,
-        r: 8 + Math.random() * 20,
-        maxR: 30 + Math.random() * 50,
-        life: 0.6 + Math.random() * 0.5,
-      });
-    }
-
-    impactEffects.push({
-      born: now, totalDur: 900,
-      cx, cy, drops, streaks, chunks, dusts
-    });
-  }
-
-  function drawImpactEffects(now) {
-    for (let ei = impactEffects.length - 1; ei >= 0; ei--) {
-      const ef = impactEffects[ei];
-      const t  = (now - ef.born) / ef.totalDur;
-      if (t >= 1) { impactEffects.splice(ei, 1); continue; }
-      const sec = t * ef.totalDur * 0.001; // 초 단위
-
-      // ── 짙은 붉은 플래시 + 피 번짐 ──
-      if (t < 0.2) {
-        const fa = (1 - t / 0.2);
-        ctx.globalAlpha = fa * 0.88;
-        const fg = ctx.createRadialGradient(ef.cx, ef.cy, 0, ef.cx, ef.cy, 80 + 50 * t);
-        fg.addColorStop(0,   "rgba(180,0,0,1)");
-        fg.addColorStop(0.4, "rgba(100,0,0,0.7)");
-        fg.addColorStop(1,   "rgba(40,0,0,0)");
-        ctx.fillStyle = fg;
-        ctx.beginPath(); ctx.arc(ef.cx, ef.cy, 130 + 80 * t, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // ── 핏줄기: 충돌점에서 선이 빠르게 뻗음 ──
-      for (const sk of ef.streaks) {
-        const st = t / sk.life;
-        if (st >= 1) continue;
-        const eased = 1 - Math.pow(1 - Math.min(st * 3, 1), 2);
-        const drawLen = sk.len * eased;
-        const ex = ef.cx + Math.cos(sk.angle + sk.kink) * drawLen;
-        const ey = ef.cy + Math.sin(sk.angle + sk.kink) * drawLen;
-        ctx.globalAlpha = (1 - st) * 0.85;
-        ctx.strokeStyle = "rgba(140,0,0,0.9)";
-        ctx.lineWidth   = 1.5 + (1 - st) * 1.5;
-        ctx.lineCap     = "round";
-        ctx.beginPath();
-        ctx.moveTo(ef.cx, ef.cy);
-        // 중간 꺾임점
-        const mx = ef.cx + Math.cos(sk.angle) * drawLen * 0.5;
-        const my = ef.cy + Math.sin(sk.angle) * drawLen * 0.5;
-        ctx.quadraticCurveTo(mx + Math.cos(sk.angle + Math.PI/2) * sk.kink * 20,
-                             my + Math.sin(sk.angle + Math.PI/2) * sk.kink * 20, ex, ey);
-        ctx.stroke();
-        // 끝 방울
-        if (st > 0.4) {
-          const dropR = (1 - st) * 3.5;
-          ctx.globalAlpha = (1 - st) * 0.8;
-          ctx.fillStyle   = "rgba(160,0,0,0.9)";
-          ctx.beginPath(); ctx.arc(ex, ey, dropR, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-
-      // ── 핏방울: 포물선으로 튀기며 중력 ──
-      for (const dp of ef.drops) {
-        const st = t / dp.life;
-        if (st >= 1) continue;
-        const gravity = 400;
-        const px = dp.x + dp.vx * sec;
-        const py = dp.y + dp.vy * sec + 0.5 * gravity * sec * sec;
-        const fa = (1 - st) * 0.9;
-
-        ctx.globalAlpha = fa;
-        ctx.fillStyle   = "rgba(150,0,0,0.95)";
-        // 눈물방울 모양: 타원으로 근사
-        ctx.beginPath();
-        ctx.ellipse(px, py, dp.r * 0.7, dp.r, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // 밝은 하이라이트
-        ctx.globalAlpha = fa * 0.4;
-        ctx.fillStyle   = "rgba(220,30,30,0.8)";
-        ctx.beginPath();
-        ctx.ellipse(px - dp.r * 0.15, py - dp.r * 0.2, dp.r * 0.25, dp.r * 0.3, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // ── 콘크리트 파편 ──
-      for (const ck of ef.chunks) {
-        const st = t / ck.life;
-        if (st >= 1) continue;
-        const gravity = 300;
-        const px  = ck.x + ck.vx * sec;
-        const py  = ck.y + ck.vy * sec + 0.5 * gravity * sec * sec;
-        const rot = ck.rot + ck.rotV * sec;
-        ctx.globalAlpha = (1 - st) * 0.85;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(rot);
-        ctx.fillStyle   = "rgba(30,5,5,0.9)";
-        ctx.fillRect(-ck.w/2, -ck.h/2, ck.w, ck.h);
-        // 파편 테두리 (약간 밝게)
-        ctx.strokeStyle = "rgba(80,10,10,0.7)";
-        ctx.lineWidth   = 0.7;
-        ctx.strokeRect(-ck.w/2, -ck.h/2, ck.w, ck.h);
-        ctx.restore();
-      }
-
-      // ── 먼지/연기 구름 ──
-      for (const du of ef.dusts) {
-        const st = t / du.life;
-        if (st >= 1) continue;
-        const px   = du.x + du.vx * sec;
-        const py   = du.y + du.vy * sec;
-        const r    = du.r + (du.maxR - du.r) * st; // 커지면서
-        const fa   = (1 - st) * 0.18;
-        ctx.globalAlpha = fa;
-        const dg = ctx.createRadialGradient(px, py, 0, px, py, r);
-        dg.addColorStop(0, "rgba(60,5,5,0.6)");
-        dg.addColorStop(1, "rgba(20,0,0,0)");
-        ctx.fillStyle = dg;
-        ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
-      }
-
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  function drawParticle(p, alpha) {
-    if (!p) return;
-    for (let i = 0; i < p.trail.length; i++) {
-      const tf = i / p.trail.length;
-      const tr = p.trail[i];
-      ctx.globalAlpha = tf * tf * 0.35 * alpha;
-      ctx.fillStyle   = p.color;
-      ctx.beginPath();
-      ctx.arc(tr.x, tr.y, 3 + tf * 10, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = alpha;
-    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 28);
-    g.addColorStop(0,   "#ffffff");
-    g.addColorStop(0.3, p.color);
-    g.addColorStop(1,   "transparent");
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(p.x, p.y, 28, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
-  // ── 7개 충돌체: 보이지 않지만 로직은 살아있음 ──
-  const APPROACH_MS = 900;
-  const IMPACT_MS   = 300;
-  const RESET_MS    = 800;
-  const WAIT_MS     = 20000;
-
-  let phase  = "waiting";
-  let phaseT = 0;
-  let particles = [];
-  let meetX = 0, meetY = 0;
-  let lastNow = 0;
-
-  function randomEdgePoint(W, H) {
-    const edge = Math.floor(Math.random() * 4);
-    if (edge === 0) return { x: 0, y: Math.random() * H };
-    if (edge === 1) return { x: W, y: Math.random() * H };
-    if (edge === 2) return { x: Math.random() * W, y: 0 };
-                    return { x: Math.random() * W, y: H };
-  }
-
-  function startApproach() {
-    const W = canvas.width, H = canvas.height;
-    meetX = W * (0.2 + Math.random() * 0.6);
-    meetY = H * (0.2 + Math.random() * 0.6);
-    particles = COLORS.map((color) => {
-      const start = randomEdgePoint(W, H);
-      return { x: start.x, y: start.y, sx: start.x, sy: start.y, color, trail: [] };
-    });
-    phase = "approach"; phaseT = 0;
-  }
-
-  function lerp(a, b, t) { return a + (b - a) * t; }
-
-  function spawnCracks(mx, my) {
-    const count = 2 + Math.floor(Math.random() * 4);
-    const spots = [{ cx: mx, cy: my }];
-    for (let i = 1; i < count; i++) {
-      spots.push({
-        cx: mx + (Math.random() - 0.5) * canvas.width  * 0.55,
-        cy: my + (Math.random() - 0.5) * canvas.height * 0.55,
-      });
-    }
-    spots.forEach(({ cx, cy }) => {
-      const ccx = Math.max(20, Math.min(canvas.width  - 20, cx));
-      const ccy = Math.max(20, Math.min(canvas.height - 20, cy));
-      const cr  = genCrack(ccx, ccy);
-      cr.bornAt  = performance.now();
-      cr.fadeDur = 120 + Math.random() * 200;
-      cracks.push(cr);
-    });
-  }
-
-  function tick(now) {
-    raf = requestAnimationFrame(tick);
-    if (!running) return;
-    const dt = Math.min(now - lastNow, 50);
-    lastNow  = now;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (const c of cracks) {
-      if (c.alpha < c.target) {
-        c.alpha = Math.min((now - c.bornAt) / c.fadeDur, 1) * c.target;
-      }
-      drawCrack(c);
-    }
-
-    phaseT += dt;
-
-    if (phase === "waiting") {
-      if (phaseT >= WAIT_MS) startApproach();
-
-    } else if (phase === "approach") {
-      const raw = phaseT / APPROACH_MS;
-      const t   = Math.min(raw, 1);
-      const e   = t * t;
-      // 충돌체 위치만 업데이트, 그리지는 않음
-      for (const p of particles) {
-        p.x = lerp(p.sx, meetX, e);
-        p.y = lerp(p.sy, meetY, e);
-      }
-      if (raw >= 1) {
-        phase = "impact"; phaseT = 0;
-        spawnCracks(meetX, meetY);
-        spawnImpactEffect(meetX, meetY, COLORS);
-        particles = [];
-      }
-
-    } else if (phase === "impact") {
-      if (phaseT / IMPACT_MS >= 1) { phase = "reset"; phaseT = 0; }
-
-    } else if (phase === "reset") {
-      if (phaseT >= RESET_MS) { phase = "waiting"; phaseT = 0; }
-    }
-
-    drawImpactEffects(now);
-  }
-
-  window.startBgCrackAnim = function () {
-    if (running) return;
-    running = true;
-    resize();
-    canvas.classList.add("visible");
-    lastNow = performance.now();
-    requestAnimationFrame(tick);
-  };
-
-  window.addEventListener("resize", () => { if (running) resize(); });
-})();
 </script>
 </div>
 </body>
