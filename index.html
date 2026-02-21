@@ -834,7 +834,7 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
 }
 .fgo-banner-text {
   font-family: 'Pretendard','Noto Sans KR',sans-serif;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: 4px;
   white-space: nowrap;
@@ -1611,8 +1611,8 @@ body { background: transparent; font-family: 'Noto Sans KR', sans-serif; padding
     </svg>
     <div class="cs-content" id="csContent">
       <span class="cs-lock-icon" id="csLockIcon">🔓</span>
-      <div class="cs-warning" id="csWarning"><span class="cs-warning-shimmer">⚠ HIDDEN STAGE UNLOCKED ⚠</span></div>
-      <div class="cs-hidden-badge" id="csBadge"><div class="cs-hidden-badge-text"><span class="cs-badge-shimmer">✦ HIDDEN ROUND ✦</span></div></div>
+      <div class="cs-warning" id="csWarning"><span class="cs-warning-shimmer">⚠ 히든 스테이지 해금 ⚠</span></div>
+      <div class="cs-hidden-badge" id="csBadge"><div class="cs-hidden-badge-text"><span class="cs-badge-shimmer">✦ 히든 라운드 ✦</span></div></div>
       <div class="cs-mystery" id="csMystery"><span id="csTypingText" class="cs-mystery-shimmer"></span><span class="cs-cursor" id="csCursor"></span></div>
       <div class="cs-title-wrap">
         <div id="csMainTitle" class="cs-char-wrap"></div>
@@ -2896,7 +2896,7 @@ function playFinishGaugeScene(winnerName, onComplete) {
   const ROW_H    = 60;
   const CHAR_W   = 240;
   const CHAR_H   = 260;
-  const NAME_W   = 52;
+  const NAME_W   = 66;
 
   players.forEach((pl, pi) => {
     const miniRow = document.createElement("div");
@@ -2906,7 +2906,7 @@ function playFinishGaugeScene(winnerName, onComplete) {
     const nameSpan = document.createElement("span");
     nameSpan.textContent = pl.sname;
     nameSpan.style.cssText =
-      `font-size:12px;font-weight:900;`+
+      `font-size:14px;font-weight:900;`+
       `color:${pl.isFirst?"#ffffff":"#ffb3b3"};`+
       `width:${NAME_W}px;flex-shrink:0;text-align:right;white-space:nowrap;`+
       `overflow:hidden;text-overflow:ellipsis;`+
